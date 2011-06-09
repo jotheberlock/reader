@@ -14,8 +14,8 @@ int main(int argc, char ** argv)
     Mobi mobi;
     mobi.open(&file);
 
-        //Page page;
-        //page.show();
+    Page page(&mobi);
+    page.show();
     
     app.exec();
 }

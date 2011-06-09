@@ -164,26 +164,25 @@ void ExthRecord::dump()
 
 QByteArray Mobi::readBlock(int b)
 {
-    QByteArray ret;
+    QByteArray outbuf;
 
     int size = records[b+1].offset-records[b].offset;
     
     char * buf = new char[size];
 
-    if (palmdoc_header->compression == 1)
+    if (palmdoc_header->compression == 1 ||
+        (unsigned int)b >= mobi_header->first_non_book)
     {
         device->seek(records[b].offset);
         device->read(buf, size);
-        ret = QByteArray(buf, size);
+        outbuf = QByteArray(buf, size);
     }
     else if (palmdoc_header->compression == 2)
     {
         device->seek(records[b].offset);
         device->read(buf, size);
-
-        char * outbuf = new char[8192];
+        
         unsigned char * inptr = (unsigned char *)buf;
-        unsigned char * outptr = (unsigned char *)outbuf;
         unsigned char * endptr = (unsigned char *)buf+size;
         
         while (inptr < endptr)
@@ -191,9 +190,8 @@ QByteArray Mobi::readBlock(int b)
             if ( (*inptr == 0x0) ||
                  ( (*inptr >= 0x09) && (*inptr <= 0x7f) ) )
             {
-                *outptr = *inptr;
+                outbuf += *inptr;
                 inptr++;
-                outptr++;
             }
             else if ( *inptr >= 0x1 && *inptr <= 0x08 )
             {
@@ -203,9 +201,8 @@ QByteArray Mobi::readBlock(int b)
                 
                 for (int loopc2=0; loopc2<count; loopc2++)
                 {
-                    *outptr = *inptr;
+                    outbuf += *inptr;
                     inptr++;
-                    outptr++;
                 }
             }
             else if ( *inptr >= 0x80 && *inptr <= 0xbf )
@@ -218,29 +215,23 @@ QByteArray Mobi::readBlock(int b)
                 unsigned int distance = (ld & ~0x7) >> 3;
                 unsigned int len = ld & 0x7;
 
-                unsigned char * refptr = outptr;
+                unsigned int refptr = outbuf.size();
 
                 for (unsigned int loopc=0; loopc<len+3; loopc++)
                 {
-                    *outptr = *(refptr - distance + loopc);
-                    outptr++;
+                    outbuf += outbuf[refptr - distance + loopc];
                 }
             }
             else   // 0xc0 to 0xff
             {
-                *outptr = ' ';
-                outptr++;
-                *outptr = (*inptr) ^ 0x80;
-                outptr++;
+                outbuf += ' ';
+                outbuf += (*inptr) ^ 0x80;
                 inptr++;
             }
         }
-
-        ret = QByteArray(outbuf, outptr - (unsigned char *)outbuf);
     }
 
-    delete[] buf;
-    return ret;
+    return outbuf;
 }
 
 void Mobi::open(QIODevice * d)
@@ -362,6 +353,12 @@ void Mobi::open(QIODevice * d)
     QString text = str.readAll();
     qte->setHtml(text);
     qte->show();
+
+    QFile file("../book.html");
+    file.open(QIODevice::WriteOnly);
+    QTextStream qts(&file);
+    qts << text;
+    file.close();
 }
 
 

@@ -121,6 +121,10 @@ class Mobi
     unsigned int blockOffset(int i)
         { return block_offsets[i]; }  // Uncompressed
     QByteArray readBlock(int);
+    int firstImage()
+    {
+        return mobi_header ? mobi_header->first_image : -1;
+    }
     
   protected:
     
@@ -137,6 +141,5 @@ class Mobi
     QVector<unsigned int> block_offsets;
     
 };
-
 
 #endif

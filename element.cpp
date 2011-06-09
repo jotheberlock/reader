@@ -4,15 +4,38 @@
 #include <QtGui/QPainter>
 #include <QtGui/QFontMetrics>
 
-bool ParagraphElement::render(QPaintDevice * d, QFont font, int x,int y, int w,
-                              int h, int & rendered_h)
+QRect ParagraphElement::size(int w)
 {
-    rendered_h = 0;
+    int xx = 20;
+    int yy = 0;
     
-    int xx = x + 40;
-    int yy = y;
+    QFontMetrics qfm(font);
+    
+    int space_width = qfm.averageCharWidth();
 
-    w -= 20;
+    for (int count=0; count<text.size(); count++)
+    {
+        QString str = text.at(count);
+        QRect rect = qfm.boundingRect(str);
+
+        if (xx + rect.width() > w)
+        {
+            xx = 0;
+            yy += qfm.lineSpacing();
+        }
+
+        xx += rect.width();
+        xx += space_width;
+    }
+
+    return QRect(0,0,w,yy+qfm.lineSpacing());
+}
+
+bool ParagraphElement::render(QPaintDevice * d, int x,int y, int w, int h,
+                              int & dropout)
+{
+    int xx = x + 20;
+    int yy = y;
     
     QFontMetrics qfm(font);
     
@@ -29,12 +52,12 @@ bool ParagraphElement::render(QPaintDevice * d, QFont font, int x,int y, int w,
 
         if (xx + rect.width() > w)
         {
-            xx = 20;
+            xx = x;
             yy += qfm.lineSpacing();
 
             if (yy + qfm.lineSpacing() > h)
             {
-                rendered_h = yy-y;
+                dropout = yy - y;
                 return true;
             }            
         }
@@ -45,7 +68,37 @@ bool ParagraphElement::render(QPaintDevice * d, QFont font, int x,int y, int w,
     }
     
     p.end();
-    rendered_h = yy-y+qfm.lineSpacing();
     return false;
+}
+
+QRect PictureElement::size(int w)
+{
+    double scale = ((double)w) / ((double)pixmap.width());
+    return QRect(0,0,(int)(scale * pixmap.width()),
+                (int)(scale * pixmap.height()));
+}
+
+bool PictureElement::render(QPaintDevice * d, int x,int y, int w, int h,
+                            int & dropout)
+{
+    if (pixmap.width() < 1 || pixmap.height() < 1)
+    {
+        return false;
+    }
+    
+    double scale = ((double)w-x) / ((double)pixmap.width());
+    int length = (int)(((double)pixmap.height()) * scale);
+
+    if (y+length > h)
+    {
+        dropout = h-y;
+    }
+    
+    QPainter p;
+    p.begin(d);
+    p.drawPixmap(x,y,(w-x),length, pixmap);
+    p.end();
+
+    return true;
 }
 
