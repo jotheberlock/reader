@@ -94,7 +94,9 @@ void Page::layoutElements()
 
 void Page::nextPage()
 {
+#ifdef DEBUG_LAYOUT
     printf("\n\nNext page\n\n");
+#endif
     start_y = -end_y;
     update();
 }
