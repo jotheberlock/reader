@@ -87,7 +87,7 @@ qint64 BookDevice::readData(char * data, qint64 maxSize)
     return-1;
 }
 
-qint64 BookDevice::writeData(const char * data, qint64 maxSize)
+qint64 BookDevice::writeData(const char *, qint64)
 {
     return -1;
 }

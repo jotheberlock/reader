@@ -1,33 +1,43 @@
 #ifndef _PARSER_
 #define _PARSER_
 
+#include <QtCore/QStack>
+
 #include "bookdevice.h"
 #include "element.h"
 
-#include <QtXml/qxml.h>
+class TagAttribute
+{
+  public:
 
-class Parser : public QXmlDefaultHandler
+    QString name;
+    QString value;
+    
+};
+
+
+class Tag
+{
+  public:
+
+    QString name;
+    QList<TagAttribute> attributes;
+    QString contents;
+    
+};
+
+
+class Parser 
 {
   public:
 
     Parser(BookDevice * d);
     Element * next();
     
-    virtual bool startElement ( const QString & namespaceURI, const QString & localName, const QString & qName, const QXmlAttributes & atts );
-    virtual bool endElement ( const QString & namespaceURI, const QString & localName, const QString & qName );
-    virtual bool characters ( const QString & ch );
-    
-    virtual bool warning ( const QXmlParseException & exception );
-    virtual bool error ( const QXmlParseException & exception );
-    virtual bool fatalError ( const QXmlParseException & exception );
-        
   protected:
-
+    
     BookDevice * device;
-    QXmlSimpleReader * reader;
-    QXmlInputSource * input;
-    bool in_para;
-    QString para_text;
+    QStack<Tag> tags;
     
 };
 
