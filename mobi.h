@@ -126,6 +126,16 @@ class Mobi
         return mobi_header ? mobi_header->first_image : -1;
     }
     
+    int encoding()
+    {
+        return mobi_header ? mobi_header->encoding : -1;
+    }
+
+    qint64 size()
+    {
+        return text_size;
+    }
+    
   protected:
     
     quint16 read16();
@@ -139,6 +149,7 @@ class Mobi
     MobiHeader * mobi_header;
     QList <ExthRecord *> exth_records;
     QVector<unsigned int> block_offsets;
+    qint64 text_size;
     
 };
 

@@ -2,6 +2,13 @@
 #include "mobi.h"
 #include <stdio.h>
 
+BookDevice::BookDevice(Mobi * m)
+    : QIODevice()
+{
+    mobi = m;
+    size = m->size();
+}
+
 bool BookDevice::open(OpenMode om)
 {
     if (!mobi)
@@ -20,6 +27,8 @@ bool BookDevice::open(OpenMode om)
     block_data = mobi->readBlock(1);
 
     QIODevice::open(om);
+
+    printf("Allowing open\n");
     
     return true;
 }
@@ -37,8 +46,21 @@ bool BookDevice::seek(qint64 pos)
     return true;
 }
 
+bool BookDevice::atEnd()
+{
+    printf("atEnd queried\n");
+    return (current_block == mobi->numBlocks());
+}
+
+qint64 	BookDevice::bytesAvailable () const
+{
+    return size-pos;
+}
+
 qint64 BookDevice::readData(char * data, qint64 maxSize)
 {
+    printf("Read attempt %lld\n", maxSize);
+    
     if (current_block == mobi->numBlocks())
     {
         return -1;
@@ -55,6 +77,8 @@ qint64 BookDevice::readData(char * data, qint64 maxSize)
             offset += maxSize;
             have_read += maxSize;
             pos += maxSize;
+            printf("Read %lld bytes\n", have_read);
+            
             return have_read;
         }
         else

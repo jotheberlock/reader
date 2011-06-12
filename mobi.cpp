@@ -325,6 +325,9 @@ void Mobi::open(QIODevice * d)
         current_offset += qba.size();
     }
 
+    text_size = current_offset;
+    
+        /*
     QTextEdit * qte = new QTextEdit();
 
     QPalette pal;
@@ -337,7 +340,6 @@ void Mobi::open(QIODevice * d)
     {
         printf("Opened device\n");
     }
-    
     QTextStream str(&bd);
 
     if (mobi_header->encoding == 1252)
@@ -348,8 +350,7 @@ void Mobi::open(QIODevice * d)
     {
         str.setCodec("UTF-8");
     }
-    
-    
+
     QString text = str.readAll();
     qte->setHtml(text);
     qte->show();
@@ -359,6 +360,7 @@ void Mobi::open(QIODevice * d)
     QTextStream qts(&file);
     qts << text;
     file.close();
+*/
 }
 
 
