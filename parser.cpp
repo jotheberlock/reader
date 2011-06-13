@@ -1,6 +1,6 @@
 #include "parser.h"
 
-Parser::Parser(BookDevice * d, int encoding)
+Parser::Parser(QIODevice * d, int encoding)
 {
     device = d;
     state = 0;

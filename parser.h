@@ -3,8 +3,8 @@
 
 #include <QtCore/QStack>
 #include <QtCore/QTextStream>
+#include <QtCore/QIODevice>
 
-#include "bookdevice.h"
 #include "element.h"
 
 class TagAttribute
@@ -32,14 +32,14 @@ class Parser
 {
   public:
 
-    Parser(BookDevice * d, int encoding);
+    Parser(QIODevice * d, int encoding);
     Element * next();
 
     void dumpTag(Tag &);
     
   protected:
     
-    BookDevice * device;
+    QIODevice * device;
     QStack<Tag> tags;
 
     int state;
