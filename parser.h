@@ -35,14 +35,20 @@ class Parser
     Parser(QIODevice * d, int encoding);
     Element * next();
 
-    void dumpTag(Tag &);
+    void dumpTag(Tag *);
+    void dumpStack();
     
   protected:
+
+    void handleTag(QString);
+    void handleContent(QString);
     
     QIODevice * device;
-    QStack<Tag> tags;
+    QStack<Tag *> tags;
 
-    int state;
+    bool parsing_tag;
+    bool continuing;
+    
     QTextStream * stream;
     
 };

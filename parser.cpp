@@ -3,7 +3,6 @@
 Parser::Parser(QIODevice * d, int encoding)
 {
     device = d;
-    state = 0;
 
     stream = new QTextStream(d);
 
@@ -15,9 +14,66 @@ Parser::Parser(QIODevice * d, int encoding)
     {
         stream->setCodec("UTF-8");
     }
+}
+
+void Parser::handleTag(QString s)
+{
+    s = s.toLower();
+    if (s[0] == '/')
+    {
+        if (tags.size() == 0)
+        {
+            printf("Got close tag [%s] without opening tag\n",
+                   s.toAscii().data());
+        }
+        
+        Tag * top = tags.top();
     
-    Tag root;
-    tags.push_back(root);
+        if (s != "/" + top->name)
+        {
+            printf("Mismatched tag. [%s] [%s]\n",
+                   s.toAscii().data(), top->name.toAscii().data());
+        }
+
+        dumpTag(top);
+        tags.pop();
+        delete top;
+    }
+    else
+    {
+        tags.push(new Tag);
+        
+        Tag * top = tags.top();
+                
+        QStringList qsl = s.split(' ');
+        top->name = qsl[0];
+        for (int loopc=1; loopc<qsl.size(); loopc++)
+        {
+            QStringList al = qsl[loopc].split('=');
+            if (al.size() != 2)
+            {
+                printf("Malformed attribute [%s]\n",
+                       qsl[loopc].toAscii().data());
+                continue;
+            }
+            
+            TagAttribute attr;
+            attr.name = al[0];
+            attr.value = al[1];
+            top->attributes.push_back(attr);
+        }
+    }    
+}
+
+void Parser::handleContent(QString s) 
+{
+    if (tags.size() == 0)
+    {
+        printf("Content [%s] with no tag\n", s.toAscii().data()); 
+        return;
+    }
+
+    tags.top()->contents = s;
 }
 
 Element * Parser::next()
@@ -28,101 +84,63 @@ Element * Parser::next()
     {
         printf("Stream at end\n");
     }
-    
-    while (!stream->atEnd())
+
+    continuing = true;
+    parsing_tag = false;
+        
+    while ((!stream->atEnd()) && continuing)
     {
         QChar ch;
         *stream >> ch;
-
-            //printf("[%c]\n", ch.toAscii());
-
-        Tag dummy;
-        Tag & tag = (tags.size() > 0) ? tags.top() : dummy;
         
-        if (state == 0)
+        if (parsing_tag)
+        {
+            if (ch == '>')
+            {
+                parsing_tag = false;
+                handleTag(accum);
+                accum = "";
+            }
+            else
+            {
+                accum += ch;
+            } 
+        }
+        else
         {
             if (ch == '<')
             {
-                printf("Entering tag state\n");
-                state = 1;
-                Tag t;
-                tags.push_back(t);
+                if (accum != "")
+                {
+                    handleContent(accum);
+                }
+                accum = "";
+                parsing_tag = true;
             }
             else
             {
-                    // Do nothing
-            } 
-        }
-        else if (state == 1)
-        {
-            if (ch == '/')
-            {
-                state = 0;
-                dumpTag(tag);
-
-                if (tags.size() > 0)
-                {
-                    tags.pop();
-                }
-                else
-                {
-                    printf("Rogue backslash\n");
-                }
+                accum += ch;
             }
-            else if (ch == '>')
-            {
-                printf("Leaving tag state for content\n");
-                
-                state = 2;
-            }
-            else if (ch == '<')
-            {
-            }
-            else
-            {
-                tag.name += ch;
-            }
-        }
-        else if (state == 2)
-        {
-            if (ch == '<')
-            {
-                printf("Reentering tag state\n");
-                state = 1;
-
-                QChar ch2;
-                *stream >> ch2;
-
-                if (ch2 != '/')
-                {
-                    Tag t;
-                    t.name = ch2;
-                    tags.push_back(t);
-                    printf("Is new tag name so far [%s]\n", t.name.toAscii().data());
-                }
-                else
-                {   
-                    dumpTag(tag);
-                    if (tags.size() > 0)
-                    {
-                        tags.pop();
-                    }
-                    while (ch2 != '>')
-                    {
-                        *stream >> ch2;
-                    }
-                }
-            }
-            else
-            {
-                tag.contents += ch;
-            } 
         }
     }
 }
 
-void Parser::dumpTag(Tag & tag)
+void Parser::dumpTag(Tag * tag)
 {
     printf("Name [%s] Contents [%s]\n",
-           tag.name.toAscii().data(), tag.contents.toAscii().data());
+           tag->name.toAscii().data(), tag->contents.toAscii().data());
+    for (int loopc=0; loopc<tag->attributes.size();loopc++)
+    {
+        printf("[%s] = [%s]\n",
+               tag->attributes[loopc].name.toAscii().data(),
+               tag->attributes[loopc].value.toAscii().data());
+    }
+}
+
+void Parser::dumpStack()
+{
+    for (int loopc=0; loopc<tags.size(); loopc++)
+    {
+        printf("%d: [%s]\n", loopc, tags[loopc]->name.toAscii().data());
+    }
 }

@@ -20,16 +20,17 @@ int main(int argc, char ** argv)
     BookDevice bd(&mobi);
     bd.open(QIODevice::ReadOnly);
     
-        //Parser parser(&bd, mobi.encoding());
+    Parser parser(&bd, mobi.encoding());
 
+        /*
     char buf[4096];
-    strcpy(buf, "<html>stuff</html>");
-
+    strcpy(buf, "<html><p boner=\"true\">things</p><p>stuff</p></html>");
     QByteArray qba(buf, strlen(buf));
     QBuffer buffer(&qba);
     buffer.open(QIODevice::ReadOnly);
     Parser parser(&buffer, 1);
-                  
+        */
+    
     parser.next();
     
         /*
