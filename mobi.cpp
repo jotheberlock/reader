@@ -354,13 +354,34 @@ void Mobi::open(QIODevice * d)
     QString text = str.readAll();
     qte->setHtml(text);
     qte->show();
+        */
 
+        /*
+    BookDevice bd(this);
+    if (bd.open(QIODevice::ReadOnly))
+    {
+        printf("Opened device\n");
+    }
+    
+    QTextStream str(&bd);
+
+    if (mobi_header->encoding == 1252)
+    {
+        str.setCodec("iso8859-1");
+    }
+    else
+    {
+        str.setCodec("UTF-8");
+    }
+
+    QString text = str.readAll();
+    
     QFile file("../book.html");
     file.open(QIODevice::WriteOnly);
     QTextStream qts(&file);
     qts << text;
     file.close();
-*/
+        */
 }
 
 

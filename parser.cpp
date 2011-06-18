@@ -44,23 +44,62 @@ void Parser::handleTag(QString s)
         tags.push(new Tag);
         
         Tag * top = tags.top();
-                
-        QStringList qsl = s.split(' ');
-        top->name = qsl[0];
-        for (int loopc=1; loopc<qsl.size(); loopc++)
+
+        int state = 0;
+        TagAttribute ta;
+        bool in_commas = false;
+        
+        for (int loopc=0; loopc<s.length(); loopc++)
         {
-            QStringList al = qsl[loopc].split('=');
-            if (al.size() != 2)
-            {
-                printf("Malformed attribute [%s]\n",
-                       qsl[loopc].toAscii().data());
-                continue;
-            }
+            QChar qc = s[loopc];
             
-            TagAttribute attr;
-            attr.name = al[0];
-            attr.value = al[1];
-            top->attributes.push_back(attr);
+            if (state == 0)  // Name 
+            {
+                if (qc == ' ')
+                {
+                    state = 1;
+                }
+                else
+                {
+                    top->name += qc;
+                } 
+            }
+            else if (state == 1) // Whitespace
+            {
+                if (qc != ' ')
+                {
+                    state = 2;
+                    ta.name = qc;
+                    ta.value = "";
+                }
+            }
+            else if (state == 2) // attribute name
+            {
+                if (qc == '=')
+                {
+                    state = 3;
+                }
+                else
+                {
+                    ta.name += qc;
+                }    
+            }
+            else if (state == 3) // attribute value
+            {
+                if (qc == '"')
+                {
+                    in_commas = !in_commas;
+                }
+                else if (qc ==' ' && !in_commas)
+                {
+                    state = 1;
+                    top->attributes.push_back(ta);
+                }
+                else
+                {
+                    ta.value += qc;
+                }
+            }
         }
     }    
 }
