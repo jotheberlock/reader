@@ -14,13 +14,30 @@ Parser::Parser(QIODevice * d, int encoding)
     {
         stream->setCodec("UTF-8");
     }
+
+        // http://www.w3.org/TR/2009/WD-html5-20090423/syntax.html#void-elements
+    
+    void_tags["area"] = "area";
+    void_tags["base"] = "base";
+    void_tags["br"] = "br";
+    void_tags["col"] = "col";
+    void_tags["command"] = "command";
+    void_tags["embed"] = "embed";
+    void_tags["hr"] = "hr";
+    void_tags["img"] = "img";
+    void_tags["input"] = "input";
+    void_tags["keygen"] = "keygen";
+    void_tags["link"] = "link";
+    void_tags["meta"] = "meta";
+    void_tags["param"] = "param";
+    void_tags["source"] = "source";
 }
 
 void Parser::handleTag(QString s)
 {
-    s = s.toLower();
     if (s[0] == '/')
     {
+        s = s.toLower();
         if (tags.size() == 0)
         {
             printf("Got close tag [%s] without opening tag\n",
@@ -45,6 +62,8 @@ void Parser::handleTag(QString s)
         
         Tag * top = tags.top();
 
+        bool self_closing = (s.right(1) == "/");
+        
         int state = 0;
         TagAttribute ta;
         bool in_commas = false;
@@ -59,9 +78,14 @@ void Parser::handleTag(QString s)
                 {
                     state = 1;
                 }
+                else if (qc == '/')
+                {
+                    self_closing = true;
+                    break;
+                }       
                 else
                 {
-                    top->name += qc;
+                    top->name += qc.toLower();
                 } 
             }
             else if (state == 1) // Whitespace
@@ -81,7 +105,7 @@ void Parser::handleTag(QString s)
                 }
                 else
                 {
-                    ta.name += qc;
+                    ta.name += qc.toLower();
                 }    
             }
             else if (state == 3) // attribute value
@@ -100,6 +124,18 @@ void Parser::handleTag(QString s)
                     ta.value += qc;
                 }
             }
+        }
+
+        if (ta.name != "")
+        {
+            top->attributes.push_back(ta);
+        }
+        
+        if (void_tags.contains(top->name) || self_closing)
+        {
+            dumpTag(top);
+            tags.pop();
+            delete top;
         }
     }    
 }

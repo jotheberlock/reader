@@ -4,6 +4,7 @@
 #include <QtCore/QStack>
 #include <QtCore/QTextStream>
 #include <QtCore/QIODevice>
+#include <QtCore/QHash>
 
 #include "element.h"
 
@@ -39,7 +40,7 @@ class Parser
     void dumpStack();
     
   protected:
-
+    
     void handleTag(QString);
     void handleContent(QString);
     
@@ -50,6 +51,8 @@ class Parser
     bool continuing;
     
     QTextStream * stream;
+
+    QHash<QString, QString> void_tags;
     
 };
 
