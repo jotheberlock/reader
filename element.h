@@ -16,28 +16,48 @@ class Element
     
 };
 
+class StringFragment
+{
+  public:
+
+    StringFragment()
+    {
+        is_italic = false;
+        is_bold = false;
+    }
+
+    StringFragment(QString t, bool i = false, bool b = false)
+    {
+        text=t.split(' '); is_italic=i; is_bold=b;
+    }
+    
+    QStringList text;
+    bool is_italic;
+    bool is_bold;
+    
+};
+
 class ParagraphElement : public Element
 {
   public:
 
-    ParagraphElement(QString t)
+    ParagraphElement()
     {
-        text=t.split(' ');
         font = QFont("Times New Roman", 20);
     }
     
-    void setText(QString t) 
-    {
-        text=t.split(' ');
-    }
-
     virtual QRect size(int w);
     virtual bool render(QPaintDevice *, int x,int y, int w, int h,
                         int & dropout);
 
+    void addFragment(StringFragment s)
+    {
+        fragments.push_back(s);
+    }
+    
   protected:
 
-    QStringList text;
+    QList<StringFragment> fragments;
     QFont font;
     
 };

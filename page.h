@@ -17,6 +17,11 @@ class Page : public QWidget
     virtual void mousePressEvent(QMouseEvent *);
     virtual void paintEvent(QPaintEvent *);
     virtual void resizeEvent(QResizeEvent *);
+
+    void addElement(Element * e)
+    {
+        elements.push_back(e);
+    }
     
   protected:
 

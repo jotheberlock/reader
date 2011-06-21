@@ -5,7 +5,8 @@ Parser::Parser(QIODevice * d, int encoding)
     device = d;
 
     stream = new QTextStream(d);
-
+    para = 0;
+    
     if (encoding == 1252)
     {
         stream->setCodec("iso8859-1");
@@ -130,6 +131,11 @@ void Parser::handleTag(QString s)
         {
             top->attributes.push_back(ta);
         }
+
+        if (top->name == "p")
+        {
+            para = new ParagraphElement;
+        }
         
         if (void_tags.contains(top->name) || self_closing)
         {
@@ -198,6 +204,8 @@ Element * Parser::next()
             }
         }
     }
+
+    return para;
 }
 
 void Parser::dumpTag(Tag * tag)
@@ -209,6 +217,16 @@ void Parser::dumpTag(Tag * tag)
         printf("[%s] = [%s]\n",
                tag->attributes[loopc].name.toAscii().data(),
                tag->attributes[loopc].value.toAscii().data());
+    }
+
+    if (tag->name == "p" && tag->contents !="")
+    {
+        StringFragment sf;
+        printf("Paragraph will be [%s]\n", tag->contents.toAscii().data());
+        
+        sf.text = tag->contents.split(' ');
+        para->addFragment(sf);
+        continuing = false;
     }
 }
 

@@ -31,12 +31,25 @@ int main(int argc, char ** argv)
     Parser parser(&buffer, 1);
         */
     
-    parser.next();
-    
-        /*
     Page page(&mobi);
-    page.show();
+
+    for (int loopc=0; loopc<40; loopc++)
+    {
+        Element * e = parser.next();
+        if (e && loopc > 20)
+        {
+            page.addElement(e);
+        }
+    }
+
+        /*
+    ParagraphElement pe;
+    pe.addFragment(StringFragment("Hi here is some text hello"));
+    pe.addFragment(StringFragment(" and here is more", true, true));
+    page.addElement(&pe);
         */
     
+    page.show();
+         
     app.exec();
 }

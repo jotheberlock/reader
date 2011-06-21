@@ -53,6 +53,8 @@ class Parser
     QTextStream * stream;
 
     QHash<QString, QString> void_tags;
+
+    ParagraphElement * para;
     
 };
 

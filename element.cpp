@@ -8,27 +8,38 @@ QRect ParagraphElement::size(int w)
 {
     int xx = 20;
     int yy = 0;
-    
-    QFontMetrics qfm(font);
-    
-    int space_width = qfm.averageCharWidth();
 
-    for (int count=0; count<text.size(); count++)
+    int linespacing = 0;
+    
+    for (int fcount=0; fcount<fragments.size(); fcount++)
     {
-        QString str = text.at(count);
-        QRect rect = qfm.boundingRect(str);
-
-        if (xx + rect.width() > w)
+        StringFragment sf = fragments.at(fcount);
+        font.setItalic(sf.is_italic);
+        font.setBold(sf.is_bold);
+        
+        QFontMetrics qfm(font);
+        qfm = QFontMetrics(font);
+        
+        int space_width = qfm.averageCharWidth();
+        linespacing = qfm.lineSpacing();
+        
+        for (int count=0; count<sf.text.size(); count++)
         {
-            xx = 0;
-            yy += qfm.lineSpacing();
-        }
+            QString str = sf.text.at(count);
+            QRect rect = qfm.boundingRect(str);
 
-        xx += rect.width();
-        xx += space_width;
+            if (xx + rect.width() > w)
+            {
+                xx = 0;
+                yy += qfm.lineSpacing();
+            }
+
+            xx += rect.width();
+            xx += space_width;
+        }
     }
 
-    return QRect(0,0,w,yy+qfm.lineSpacing());
+    return QRect(0,0,w,yy+linespacing);
 }
 
 bool ParagraphElement::render(QPaintDevice * d, int x,int y, int w, int h,
@@ -37,34 +48,45 @@ bool ParagraphElement::render(QPaintDevice * d, int x,int y, int w, int h,
     int xx = x + 20;
     int yy = y;
     
-    QFontMetrics qfm(font);
-    
-    int space_width = qfm.averageCharWidth();
-
     QPainter p;
     p.begin(d);
-    p.setFont(font);
 
-    for (int count=0; count<text.size(); count++)
+    int linespacing = 0;
+    
+    for (int fcount=0; fcount<fragments.size(); fcount++)
     {
-        QString str = text.at(count);
-        QRect rect = qfm.boundingRect(str);
+        StringFragment sf = fragments.at(fcount);
+        font.setItalic(sf.is_italic);
+        font.setBold(sf.is_bold);
 
-        if (xx + rect.width() > w)
+        QFontMetrics qfm(font);
+        qfm = QFontMetrics(font);
+        p.setFont(font);
+        
+        int space_width = qfm.averageCharWidth();
+        linespacing = qfm.lineSpacing();
+        
+        for (int count=0; count<sf.text.size(); count++)
         {
-            xx = x;
-            yy += qfm.lineSpacing();
+            QString str = sf.text.at(count);
+            QRect rect = qfm.boundingRect(str);
 
-            if (yy + qfm.lineSpacing() > h)
+            if (xx + rect.width() > w)
             {
-                dropout = yy - y;
-                return true;
-            }            
-        }
+                xx = x;
+                yy += qfm.lineSpacing();
 
-        p.drawText(xx, yy+qfm.ascent(), str);
-        xx += rect.width();
-        xx += space_width;
+                if (yy + qfm.lineSpacing() > h)
+                {
+                    dropout = yy - y;
+                    return true;
+                }            
+            }
+
+            p.drawText(xx, yy+qfm.ascent(), str);
+            xx += rect.width();
+            xx += space_width;
+        }
     }
     
     p.end();
