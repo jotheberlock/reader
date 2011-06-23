@@ -49,6 +49,7 @@ class Parser
 
     bool parsing_tag;
     bool continuing;
+    bool in_paragraph;
     
     QTextStream * stream;
 

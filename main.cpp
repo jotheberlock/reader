@@ -33,10 +33,10 @@ int main(int argc, char ** argv)
     
     Page page(&mobi);
 
-    for (int loopc=0; loopc<40; loopc++)
+    for (int loopc=0; loopc<50; loopc++)
     {
         Element * e = parser.next();
-        if (e && loopc > 20)
+        if (e)
         {
             page.addElement(e);
         }

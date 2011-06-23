@@ -6,6 +6,7 @@ Parser::Parser(QIODevice * d, int encoding)
 
     stream = new QTextStream(d);
     para = 0;
+    in_paragraph = false;
     
     if (encoding == 1252)
     {
@@ -135,6 +136,7 @@ void Parser::handleTag(QString s)
         if (top->name == "p")
         {
             para = new ParagraphElement;
+            in_paragraph = true;
         }
         
         if (void_tags.contains(top->name) || self_closing)
@@ -154,7 +156,7 @@ void Parser::handleContent(QString s)
         return;
     }
 
-    tags.top()->contents = s;
+    tags.top()->contents += s;
 }
 
 Element * Parser::next()
@@ -219,14 +221,38 @@ void Parser::dumpTag(Tag * tag)
                tag->attributes[loopc].value.toAscii().data());
     }
 
-    if (tag->name == "p" && tag->contents !="")
+    if (tag->contents != "")
     {
-        StringFragment sf;
-        printf("Paragraph will be [%s]\n", tag->contents.toAscii().data());
+        printf("Processing [%s] [%s]\n",
+               tag->name.toAscii().data(),
+               tag->contents.toAscii().data());
+        if (tag->name == "p")
+        {
+            StringFragment sf;
         
-        sf.text = tag->contents.split(' ');
-        para->addFragment(sf);
-        continuing = false;
+            sf.text = tag->contents.split(' ');
+            para->addFragment(sf);
+            continuing = false;
+            in_paragraph = false;
+        }
+        else if (in_paragraph)
+        {
+            StringFragment sf;
+            sf.text = tag->contents.split(' ');
+            for (int loopc=0; loopc<tags.size(); loopc++)
+            {
+                Tag * tag = tags.at(loopc);
+                if (tag->name == "b")
+                {
+                    sf.is_bold = true;
+                }
+                else if (tag->name == "i")
+                {
+                    sf.is_italic = true;
+                }
+            }
+            para->addFragment(sf);
+        }
     }
 }
 
