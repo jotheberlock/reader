@@ -63,7 +63,9 @@ qint64 BookDevice::readData(char * data, qint64 maxSize)
     
     if (current_block == mobi->numBlocks())
     {
-        return -1;
+        printf("Bailing because of out of data\n");
+        abort();
+        return 0;
     } 
 
     qint64 have_read = 0;
@@ -107,8 +109,9 @@ qint64 BookDevice::readData(char * data, qint64 maxSize)
             pos += partial_read;
         }
     }
-    
-    return-1;
+
+    printf("Bailing at end\n");
+    return 0;
 }
 
 qint64 BookDevice::writeData(const char *, qint64)

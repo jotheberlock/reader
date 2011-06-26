@@ -156,7 +156,26 @@ void Parser::handleContent(QString s)
         return;
     }
 
-    tags.top()->contents += s;
+    Tag * tag = tags.top();
+
+    if (in_paragraph)
+    {
+        StringFragment sf;
+        sf.text = s.split(' ');
+        for (int loopc=0; loopc<tags.size(); loopc++)
+        {
+            Tag * tag = tags.at(loopc);
+            if (tag->name == "b")
+            {
+                sf.is_bold = true;
+            }
+            else if (tag->name == "i")
+            {
+                sf.is_italic = true;
+            }
+        }
+        para->addFragment(sf);
+    }
 }
 
 Element * Parser::next()
@@ -165,7 +184,7 @@ Element * Parser::next()
 
     if (stream->atEnd())
     {
-        printf("Stream at end\n");
+        return 0;
     }
 
     continuing = true;
@@ -195,6 +214,9 @@ Element * Parser::next()
             {
                 if (accum != "")
                 {
+                    printf("Handlecontent for [%s] of [%s]\n",
+                           tags.top()->name.toAscii().data(),
+                           accum.toAscii().data());
                     handleContent(accum);
                 }
                 accum = "";
@@ -220,39 +242,15 @@ void Parser::dumpTag(Tag * tag)
                tag->attributes[loopc].name.toAscii().data(),
                tag->attributes[loopc].value.toAscii().data());
     }
-
-    if (tag->contents != "")
+    
+    if (tag->name == "p")
     {
-        printf("Processing [%s] [%s]\n",
-               tag->name.toAscii().data(),
-               tag->contents.toAscii().data());
-        if (tag->name == "p")
+        if (para->numFragments() > 0)
         {
-            StringFragment sf;
-        
-            sf.text = tag->contents.split(' ');
-            para->addFragment(sf);
             continuing = false;
-            in_paragraph = false;
         }
-        else if (in_paragraph)
-        {
-            StringFragment sf;
-            sf.text = tag->contents.split(' ');
-            for (int loopc=0; loopc<tags.size(); loopc++)
-            {
-                Tag * tag = tags.at(loopc);
-                if (tag->name == "b")
-                {
-                    sf.is_bold = true;
-                }
-                else if (tag->name == "i")
-                {
-                    sf.is_italic = true;
-                }
-            }
-            para->addFragment(sf);
-        }
+        
+        in_paragraph = false;
     }
 }
 

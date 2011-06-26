@@ -43,7 +43,7 @@ class ParagraphElement : public Element
 
     ParagraphElement()
     {
-        font = QFont("Times New Roman", 20);
+        font = QFont("Times New Roman", 12);
     }
     
     virtual QRect size(int w);
@@ -53,6 +53,11 @@ class ParagraphElement : public Element
     void addFragment(StringFragment s)
     {
         fragments.push_back(s);
+    }
+
+    int numFragments()
+    {
+        return fragments.size();
     }
     
   protected:

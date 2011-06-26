@@ -24,7 +24,7 @@ int main(int argc, char ** argv)
 
         /*
     char buf[4096];
-    strcpy(buf, "<html><p boner=\"true\">things</p><p>stuff</p></html>");
+    strcpy(buf, "<p>Here is some <i>italic</i> text and some <b>bold</b></p>");
     QByteArray qba(buf, strlen(buf));
     QBuffer buffer(&qba);
     buffer.open(QIODevice::ReadOnly);
@@ -33,12 +33,16 @@ int main(int argc, char ** argv)
     
     Page page(&mobi);
 
-    for (int loopc=0; loopc<50; loopc++)
+    for (int loopc=0; loopc<150; loopc++)
     {
         Element * e = parser.next();
         if (e)
         {
             page.addElement(e);
+        }
+        else
+        {
+            break;
         }
     }
 
