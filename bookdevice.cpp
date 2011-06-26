@@ -54,7 +54,7 @@ bool BookDevice::atEnd()
 
 qint64 	BookDevice::bytesAvailable () const
 {
-    return size-pos;
+    return size-pos + QIODevice::bytesAvailable();
 }
 
 qint64 BookDevice::readData(char * data, qint64 maxSize)
