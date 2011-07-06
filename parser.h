@@ -28,7 +28,6 @@ class Tag
     
 };
 
-
 class Parser 
 {
   public:
@@ -43,6 +42,7 @@ class Parser
     
     void handleTag(QString);
     void handleContent(QString);
+    QString handleSpecialEntity(QString);
     
     QIODevice * device;
     QStack<Tag *> tags;
@@ -50,11 +50,13 @@ class Parser
     bool parsing_tag;
     bool continuing;
     bool in_paragraph;
+    bool in_special_entity;
     
     QTextStream * stream;
 
     QHash<QString, QString> void_tags;
-
+    QHash<QString, QString> special_entities;
+    
     ParagraphElement * para;
     
 };

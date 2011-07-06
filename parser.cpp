@@ -33,6 +33,8 @@ Parser::Parser(QIODevice * d, int encoding)
     void_tags["meta"] = "meta";
     void_tags["param"] = "param";
     void_tags["source"] = "source";
+
+    special_entities["quot"] = "\"";
 }
 
 void Parser::handleTag(QString s)
@@ -178,10 +180,16 @@ void Parser::handleContent(QString s)
     }
 }
 
+QString Parser::handleSpecialEntity(QString)
+{
+    return "";
+}
+
 Element * Parser::next()
 {
     QString accum;
-
+    QString entity_accum;
+    
     if (stream->atEnd())
     {
         return 0;
@@ -221,6 +229,20 @@ Element * Parser::next()
                 }
                 accum = "";
                 parsing_tag = true;
+            }
+            else if (ch == '&' && !in_special_entity)
+            {
+                in_special_entity = true;
+                entity_accum = "";
+            }
+            else if (ch == ';' && in_special_entity)
+            {
+                in_special_entity = false;
+                accum += handleSpecialEntity(entity_accum);
+            }
+            else if (in_special_entity)
+            {
+                entity_accum += ch;
             }
             else
             {
