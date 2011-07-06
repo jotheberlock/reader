@@ -31,20 +31,7 @@ int main(int argc, char ** argv)
     Parser parser(&buffer, 1);
         */
     
-    Page page(&mobi);
-
-    for (int loopc=0; loopc<150; loopc++)
-    {
-        Element * e = parser.next();
-        if (e)
-        {
-            page.addElement(e);
-        }
-        else
-        {
-            break;
-        }
-    }
+    Page page(&mobi, &parser);
 
         /*
     ParagraphElement pe;

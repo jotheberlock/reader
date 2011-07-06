@@ -2,12 +2,14 @@
 
 #include "page.h"
 #include "mobi.h"
+#include "parser.h"
 
 // #define DEBUG_LAYOUT
 
-Page::Page(Mobi * m)
+Page::Page(Mobi * m, Parser * p)
 {
     mobi = m;
+    parser = p;
     
     QImage image;
     image = QImage::fromData(mobi->readBlock(mobi->firstImage()),"GIF");
@@ -53,9 +55,22 @@ void Page::layoutElements()
 #ifdef DEBUG_LAYOUT    
     printf("Start y %d\n", y);
 #endif
+
+    int loopc = 0;
     
-    for (int loopc=0;loopc<elements.size();loopc++)
+    while (true)
     {
+        while (loopc >= elements.size())
+        {
+            Element * tmp = parser->next();
+            if (tmp == 0)
+            {
+                return;
+            }
+
+            elements.push_back(tmp);
+        }
+        
         Element * e = elements.at(loopc);
         QRect size = e->size(width());
 
@@ -82,6 +97,8 @@ void Page::layoutElements()
         {
             y += size.height();
         }
+
+        loopc++;
     }
 }
 

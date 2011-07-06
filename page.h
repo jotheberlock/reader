@@ -7,12 +7,13 @@
 #include "element.h"
 
 class Mobi;
+class Parser;
 
 class Page : public QWidget
 {
   public:
 
-    Page(Mobi *);
+    Page(Mobi *, Parser *);
 
     virtual void mousePressEvent(QMouseEvent *);
     virtual void paintEvent(QPaintEvent *);
@@ -34,6 +35,7 @@ class Page : public QWidget
     int start_y;
     int end_y;
     Mobi * mobi;
+    Parser * parser;
     
 };
 
