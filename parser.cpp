@@ -35,6 +35,54 @@ Parser::Parser(QIODevice * d, int encoding)
     void_tags["source"] = "source";
 
     special_entities["quot"] = "\"";
+    special_entities["apos"] = "'";
+    special_entities["amp"] = "&";
+    special_entities["lt"] = "<";
+    special_entities["gt"] = ">";
+    special_entities["nbsp"] = " ";
+    special_entities["iexcl"] = QChar(0xa1);
+    special_entities["euro"] = QChar(0x20ac);
+    special_entities["cent"] = QChar(0x161);
+    special_entities["pound"] = QChar(0x163);
+    special_entities["curren"] = QChar(0x164);
+    special_entities["yen"] = QChar(0x165);
+    special_entities["brvbar"] = QChar(0xa6);
+    special_entities["sect"] = QChar(0xa7);
+    special_entities["uml"] = QChar(0xa8);
+    special_entities["copy"] = QChar(0xa9);
+    special_entities["ordf"] = QChar(0xaa);
+    special_entities["laquo"] = QChar(0xa8);
+    special_entities["not"] = QChar(0xac);
+    special_entities["reg"] = QChar(0xae);
+    special_entities["macr"] = QChar(0xaf);
+    special_entities["deg"] = QChar(0xb0);
+    special_entities["plusmn"] = QChar(0xb1);
+    special_entities["sup2"] = QChar(0xb2);
+    special_entities["sup3"] = QChar(0xb3);
+    special_entities["acute"] = QChar(0xb4);
+    special_entities["micro"] = QChar(0xb5);
+    special_entities["para"] = QChar(0xb6);
+    special_entities["middot"] = QChar(0xb7);
+    special_entities["cedil"] = QChar(0xb8);
+    special_entities["sup1"] = QChar(0xb9);
+    special_entities["ordm"] = QChar(0xba);
+    special_entities["raquo"] = QChar(0xbb);
+    special_entities["frac14"] = QChar(0xbc);
+    special_entities["frac12"] = QChar(0xbd);
+    special_entities["frac34"] = QChar(0xbe);
+    special_entities["iquest"] = QChar(0xbf);
+    special_entities["times"] = QChar(0xd7);
+    special_entities["divide"] = QChar(0xf7);
+    special_entities["lsquo"] = QChar(0x2018);
+    special_entities["rsquo"] = QChar(0x2019);
+    special_entities["ldquo"] = QChar(0x201c);
+    special_entities["rdquo"] = QChar(0x201d);
+    special_entities["bullet"] = QChar(0x2022);
+    special_entities["endash"] = QChar(0x2013);
+    special_entities["emdash"] = QChar(0x2014);
+    special_entities["ndash"] = QChar(0x2013);
+    special_entities["mdash"] = QChar(0x2014);
+    
 }
 
 void Parser::handleTag(QString s)
@@ -180,8 +228,43 @@ void Parser::handleContent(QString s)
     }
 }
 
-QString Parser::handleSpecialEntity(QString)
+QString Parser::handleSpecialEntity(QString s)
 {
+    printf("Looking for entity [%s]\n", s.toAscii().data());
+
+    if (s[0] == '#')
+    {
+        bool ok;
+        ushort ret;
+        
+        if (s[1] == 'x')
+        {
+            s = s.remove(0,2);
+            ret = s.toUShort(&ok, 16);
+        }
+        else
+        {
+            s = s.remove(0,1);
+            ret = s.toUShort(&ok, 10);
+        }
+        
+        if (ok)
+        {
+            QString sret = QChar(ret);
+            printf(">> Returning %d [%s]\n", ret, sret.toUtf8().data());
+            return sret;
+        }
+        else
+        {
+            return "";
+        }
+    }
+    
+    if (special_entities.contains(s))
+    {
+        return special_entities[s];
+    }
+    
     return "";
 }
 
