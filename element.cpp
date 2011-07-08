@@ -96,6 +96,10 @@ bool ParagraphElement::render(QPaintDevice * d, int x,int y, int w, int h,
 QRect PictureElement::size(int w)
 {
     double scale = ((double)w) / ((double)pixmap.width());
+
+    printf(">> Scale %f %f %f\n",
+           scale, ((double)w), ((double)pixmap.width()));
+    
     return QRect(0,0,(int)(scale * pixmap.width()),
                 (int)(scale * pixmap.height()));
 }

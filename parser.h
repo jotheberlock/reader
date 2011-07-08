@@ -7,6 +7,7 @@
 #include <QtCore/QHash>
 
 #include "element.h"
+#include "mobi.h"
 
 class TagAttribute
 {
@@ -32,7 +33,7 @@ class Parser
 {
   public:
 
-    Parser(QIODevice * d, int encoding);
+    Parser(QIODevice * d, Mobi * m);
     Element * next();
 
     void dumpTag(Tag *);
@@ -56,8 +57,9 @@ class Parser
 
     QHash<QString, QString> void_tags;
     QHash<QString, QString> special_entities;
-    
-    ParagraphElement * para;
+
+    Element * element;
+    Mobi * mobi;
     
 };
 

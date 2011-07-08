@@ -1,14 +1,15 @@
 #include "parser.h"
 
-Parser::Parser(QIODevice * d, int encoding)
+Parser::Parser(QIODevice * d, Mobi * m)
 {
     device = d;
-
+    mobi = m;
+    
     stream = new QTextStream(d);
-    para = 0;
+    element = 0;
     in_paragraph = false;
     
-    if (encoding == 1252)
+    if (mobi->encoding() == 1252)
     {
         stream->setCodec("iso8859-1");
     }
@@ -82,7 +83,10 @@ Parser::Parser(QIODevice * d, int encoding)
     special_entities["emdash"] = QChar(0x2014);
     special_entities["ndash"] = QChar(0x2013);
     special_entities["mdash"] = QChar(0x2014);
-    
+    special_entities["AElig"] = QChar(0x00c6);
+    special_entities["aelig"] = QChar(0x00e6);
+    special_entities["OElig"] = QChar(0x0152);
+    special_entities["oelig"] = QChar(0x0153);
 }
 
 void Parser::handleTag(QString s)
@@ -185,10 +189,10 @@ void Parser::handleTag(QString s)
 
         if (top->name == "p")
         {
-            para = new ParagraphElement;
+            element = new ParagraphElement;
             in_paragraph = true;
         }
-        
+
         if (void_tags.contains(top->name) || self_closing)
         {
             dumpTag(top);
@@ -206,8 +210,6 @@ void Parser::handleContent(QString s)
         return;
     }
 
-    Tag * tag = tags.top();
-
     if (in_paragraph)
     {
         StringFragment sf;
@@ -224,7 +226,7 @@ void Parser::handleContent(QString s)
                 sf.is_italic = true;
             }
         }
-        para->addFragment(sf);
+        ((ParagraphElement *)element)->addFragment(sf);
     }
 }
 
@@ -334,7 +336,7 @@ Element * Parser::next()
         }
     }
 
-    return para;
+    return element;
 }
 
 void Parser::dumpTag(Tag * tag)
@@ -350,12 +352,45 @@ void Parser::dumpTag(Tag * tag)
     
     if (tag->name == "p")
     {
-        if (para->numFragments() > 0)
+        if (((ParagraphElement *)element)->numFragments() > 0)
         {
             continuing = false;
         }
         
         in_paragraph = false;
+    }
+
+    if (tag->name == "img")
+    {    
+        for (int loopc=0; loopc<tag->attributes.size();loopc++)
+        {
+            if (tag->attributes[loopc].name == "recindex")
+            {
+                bool ok;
+                int pnum = tag->attributes[loopc].value.toInt(&ok);
+                if (!ok)
+                {
+                    printf("Can't parse image [%s]\n",
+                           tag->attributes[loopc].value.toAscii().data());
+                    break;
+                }
+
+                printf("Making image [%d]\n", pnum);
+                
+                QByteArray qba = mobi->readBlock(mobi->firstImage()+pnum-1);
+                QImage qi = QImage::fromData(qba, "GIF");
+                if (!qi.isNull())
+                {
+                    PictureElement * pe = new PictureElement(qi);
+                    element = pe;
+                    continuing = false;
+                }
+                else
+                {
+                    printf("Is null\n");
+                }
+            }
+        }
     }
 }
 

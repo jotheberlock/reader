@@ -3,6 +3,7 @@
 #include "page.h"
 #include "mobi.h"
 #include "parser.h"
+#include "shelfscreen.h"
 
 // #define DEBUG_LAYOUT
 
@@ -37,14 +38,21 @@ void Page::resizeEvent(QResizeEvent *)
 
 void Page::mousePressEvent(QMouseEvent * event)
 {
-    int sensitive_zone = width() / 10;
-    if (event->x() < sensitive_zone)
+    int sensitive_zone_x = width() / 10;
+    int sensitive_zone_y = height() / 10;
+    if (event->x() < sensitive_zone_x)
     {
         previousPage();
     }
-    else if (event->x() > width() - sensitive_zone)
+    else if (event->x() > width() - sensitive_zone_x)
     {
         nextPage();
+    }
+    else if (event->y() > height() - sensitive_zone_y)
+    {
+        top_level->setCurrentIndex(0);
+        top_level->removeWidget(this);
+        delete this;
     }
 }
 

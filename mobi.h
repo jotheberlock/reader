@@ -111,7 +111,8 @@ class Mobi
 {
   public:
 
-    void open(QIODevice *);
+    bool sniff(QIODevice *);
+    void open();
 
     int numBlocks()
     {
@@ -134,6 +135,16 @@ class Mobi
     qint64 size()
     {
         return text_size;
+    }
+
+    QIODevice * getDevice()
+    {
+        return device;
+    }
+
+    QString getFullName()
+    {
+        return fullname;
     }
     
   protected:

@@ -234,7 +234,7 @@ QByteArray Mobi::readBlock(int b)
     return outbuf;
 }
 
-void Mobi::open(QIODevice * d)
+bool Mobi::sniff(QIODevice * d)
 {
     device = d;
     header = new PDBHeader;
@@ -261,17 +261,32 @@ void Mobi::open(QIODevice * d)
     device->read((char *)mobisig, 4);
     if (strcmp(mobisig, "MOBI") != 0)
     {
-        return;
+        return false;
     }
 
+    if (palmdoc_header->encryption != 0)
+    {
+        return false;
+    }
+
+    if (palmdoc_header->compression != 1 && palmdoc_header->compression != 2)
+    {
+        return false;
+    }
+    
     mobi_header = new MobiHeader;
     device->read((char *)mobi_header, sizeof(MobiHeader));
     mobi_header->swap();
     mobi_header->dump();
 
+    if (mobi_header->drm_offset != 0xffffffff)
+    {
+        return false;
+    }
+    
     if (!mobi_header->exth_flags & 0x40)
     {
-        return;
+        return true;
     }
     
     char buf[4096];
@@ -283,7 +298,7 @@ void Mobi::open(QIODevice * d)
     if (strcmp(extsig, "EXTH") != 0)
     {
         printf("Expected EXTH didn't find it [%s]\n", extsig);
-        return;
+        return true;
     }
     
     device->read((char *)extsig, 4);
@@ -316,6 +331,11 @@ void Mobi::open(QIODevice * d)
     fullname = QString(fname);
     delete[] fname;
 
+    return true;
+}
+
+void Mobi::open()
+{
     unsigned int current_offset = 0;
     
     for (unsigned int loopc=1; loopc<mobi_header->first_non_book; loopc++)
