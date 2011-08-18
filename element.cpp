@@ -97,8 +97,7 @@ QRect PictureElement::size(int w)
 {
     double scale = ((double)w) / ((double)pixmap.width());
 
-    printf(">> Scale %f %f %f\n",
-           scale, ((double)w), ((double)pixmap.width()));
+    qDebug(">> Scale %f %f %f", scale, ((double)w), ((double)pixmap.width()));
     
     return QRect(0,0,(int)(scale * pixmap.width()),
                 (int)(scale * pixmap.height()));

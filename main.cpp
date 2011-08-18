@@ -62,7 +62,8 @@ int main(int argc, char ** argv)
     
     Shelfscreen * shelfscreen = new Shelfscreen;
     shelfscreen->update();
-    shelfscreen->resize(shelfscreen->minimumSize());
+    shelfscreen->resize(480,640);
+        //shelfscreen->resize(shelfscreen->minimumSize());
     QScrollArea * qsa = new QScrollArea;
     qsa->setWidget(shelfscreen);
 
@@ -71,6 +72,11 @@ int main(int argc, char ** argv)
     top_level = new QStackedWidget;
     top_level->addWidget(qsa);
     top_level->show();
+
+    /*
+    QLabel * qlabel = new QLabel("Hi!");
+    qlabel->show();
+*/
 
     app.exec();
 }

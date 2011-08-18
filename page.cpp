@@ -5,7 +5,7 @@
 #include "parser.h"
 #include "shelfscreen.h"
 
-// #define DEBUG_LAYOUT
+#define DEBUG_LAYOUT
 
 Page::Page(Mobi * m, Parser * p)
 {
@@ -16,11 +16,11 @@ Page::Page(Mobi * m, Parser * p)
     image = QImage::fromData(mobi->readBlock(mobi->firstImage()),"GIF");
     if (!image.isNull())
     {
-        printf("Got image\n");
+        qDebug("Got image");
     }
     else
     {
-        printf("No image\n");
+        qDebug("No image");
     }
 
     start_y = 0;
@@ -61,7 +61,7 @@ void Page::layoutElements()
     int y = start_y;
 
 #ifdef DEBUG_LAYOUT    
-    printf("Start y %d\n", y);
+    qDebug("Start y %d", y);
 #endif
 
     int loopc = 0;
@@ -80,6 +80,12 @@ void Page::layoutElements()
         }
         
         Element * e = elements.at(loopc);
+
+        if (e->pageTerminator())
+        {
+            break;
+        }
+        
         QRect size = e->size(width());
 
         int dropout = 0;
@@ -87,7 +93,7 @@ void Page::layoutElements()
         e->render(this, 0, y, width(), height(), dropout);
         
 #ifdef DEBUG_LAYOUT    
-        printf("At %d widget height %d item height %d dropout %d\n", y,
+        qDebug("At %d widget height %d item height %d dropout %d\n", y,
                height(), size.height(), dropout);
 #endif        
         if (y+size.height() > height())
@@ -96,7 +102,7 @@ void Page::layoutElements()
             end_y = -start_y + (height() - dropdiff);
             
 #ifdef DEBUG_LAYOUT    
-            printf("Stopped rendering at %d, dropout %d, dropdiff %d, end_y %d\n",
+            qDebug("Stopped rendering at %d, dropout %d, dropdiff %d, end_y %d",
                    y, dropout, dropdiff, end_y);
 #endif
             break;
@@ -113,7 +119,7 @@ void Page::layoutElements()
 void Page::nextPage()
 {
 #ifdef DEBUG_LAYOUT
-    printf("\n\nNext page\n\n");
+    qDebug("\nNext page\n");
 #endif
     start_y = -end_y;
     update();

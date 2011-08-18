@@ -21,12 +21,12 @@ void Bookshelf::scanDirectory(QString d)
         Mobi * mobi = new Mobi;
         if (mobi->sniff(file))
         {
-            printf("Adding [%s]\n", fname.toAscii().data());
+            qDebug("Adding [%s]", fname.toAscii().data());
             books.push_back(mobi);
         }
         else
         {
-            printf("Can't read [%s]\n", fname.toAscii().data());
+            qDebug("Can't read [%s]", fname.toAscii().data());
             delete mobi;
             delete file;
         }

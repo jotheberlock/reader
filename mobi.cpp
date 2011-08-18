@@ -42,22 +42,22 @@ void PDBHeader::dump()
 {
     char buf[5];
     
-    printf("PDB Header:\n\n");
-    printf("Name [%s]\n", name);
-    printf("Attributes %x\n", attributes);
-    printf("Version %x\n", version);
-    printf("Create date %s\n", makeDate(create_date).toAscii().data());
-    printf("Mod date %s\n", makeDate(mod_date).toAscii().data());
-    printf("Backup date %s\n", makeDate(backup_date).toAscii().data());
-    printf("Mod number %d\n", mod_number);
-    printf("appInfoID %d\n", appInfoID);
-    printf("sortInfoID %d\n", sortInfoID);
+    qDebug("PDB Header:\n");
+    qDebug("Name [%s]", name);
+    qDebug("Attributes %x", attributes);
+    qDebug("Version %x", version);
+    qDebug("Create date %s", makeDate(create_date).toAscii().data());
+    qDebug("Mod date %s", makeDate(mod_date).toAscii().data());
+    qDebug("Backup date %s", makeDate(backup_date).toAscii().data());
+    qDebug("Mod number %d", mod_number);
+    qDebug("appInfoID %d", appInfoID);
+    qDebug("sortInfoID %d", sortInfoID);
     fromCC(type, buf);
-    printf("Type %s\n", buf);
+    qDebug("Type %s", buf);
     fromCC(creator, buf);
-    printf("Creator %s\n", buf);
-    printf("Unique ID seed %d\n", uniqueIDseed);
-    printf("Number of records %d\n", num_records);
+    qDebug("Creator %s", buf);
+    qDebug("Unique ID seed %d", uniqueIDseed);
+    qDebug("Number of records %d", num_records);
 }
 
 void RecordData::swap()
@@ -76,12 +76,12 @@ void PalmdocHeader::swap()
 
 void PalmdocHeader::dump()
 {
-    printf("Palmdoc header\n\n");
-    printf("Compression %d\n", compression);
-    printf("Text length %d\n", text_length);
-    printf("Record count %d\n", record_count);
-    printf("Record size %d\n", record_size);
-    printf("Encryption %d\n", encryption);
+    qDebug("Palmdoc header");
+    qDebug("Compression %d", compression);
+    qDebug("Text length %d", text_length);
+    qDebug("Record count %d", record_count);
+    qDebug("Record size %d", record_size);
+    qDebug("Encryption %d", encryption);
 }
 
 
@@ -111,27 +111,27 @@ void MobiHeader::swap()
 
 void MobiHeader::dump()
 {
-    printf("Mobi header\n\n");
-    printf("Header length %d\n", header_length);
-    printf("Type %d\n", type);
-    printf("Encoding %d\n", encoding);
-    printf("UID %d\n", uid);
-    printf("Version %d\n", version);
-    printf("First non book %d\n", first_non_book);
-    printf("Full name offset %d\n", full_name_offset);
-    printf("Full name length %d\n", full_name_length);
-    printf("Book locale %x\n", book_locale);
-    printf("Input language %d\n", input_language);
-    printf("Output language %d\n", output_language);
-    printf("Min version %d\n", min_version);
-    printf("First image %d\n", first_image);
-    printf("Huffman record offset %d\n", huffman_record_offset);
-    printf("Huffman record count %d\n", huffman_record_count);
-    printf("EXTH flags %x\n", exth_flags);
-    printf("DRM offset %d\n", drm_offset);
-    printf("DRM count %d\n", drm_count);
-    printf("DRM size %d\n", drm_size);
-    printf("DRM flags %x\n", drm_flags);
+    qDebug("Mobi header");
+    qDebug("Header length %d", header_length);
+    qDebug("Type %d", type);
+    qDebug("Encoding %d", encoding);
+    qDebug("UID %d", uid);
+    qDebug("Version %d", version);
+    qDebug("First non book %d", first_non_book);
+    qDebug("Full name offset %d", full_name_offset);
+    qDebug("Full name length %d", full_name_length);
+    qDebug("Book locale %x", book_locale);
+    qDebug("Input language %d", input_language);
+    qDebug("Output language %d", output_language);
+    qDebug("Min version %d", min_version);
+    qDebug("First image %d", first_image);
+    qDebug("Huffman record offset %d", huffman_record_offset);
+    qDebug("Huffman record count %d", huffman_record_count);
+    qDebug("EXTH flags %x", exth_flags);
+    qDebug("DRM offset %d", drm_offset);
+    qDebug("DRM count %d", drm_count);
+    qDebug("DRM size %d", drm_size);
+    qDebug("DRM flags %x", drm_flags);
 }
 
 void ExthRecord::swap()
@@ -142,7 +142,7 @@ void ExthRecord::swap()
 
 void ExthRecord::dump()
 {
-    printf("Record %d length %d ", type, length);
+    qDebug("Record %d length %d ", type, length);
 
     bool is_text = false;
     if (type >= 100 && type <= 114)
@@ -156,10 +156,8 @@ void ExthRecord::dump()
 
     if (is_text)
     {
-        printf("[%s]", data);
+        qDebug("[%s]", data);
     }
-    
-    printf("\n");
 }
 
 QByteArray Mobi::readBlock(int b)
@@ -240,7 +238,6 @@ bool Mobi::sniff(QIODevice * d)
     header = new PDBHeader;
     device->read((char *)header, 78);
     header->swap();
-    header->dump();
 
     records = new RecordData[header->num_records];
 
@@ -254,7 +251,6 @@ bool Mobi::sniff(QIODevice * d)
     device->seek(records[0].offset);
     device->read((char *)palmdoc_header, 16);
     palmdoc_header->swap();
-    palmdoc_header->dump();
 
     char mobisig[5];
     mobisig[4] = 0;
@@ -273,6 +269,9 @@ bool Mobi::sniff(QIODevice * d)
     {
         return false;
     }
+    
+    header->dump();
+    palmdoc_header->dump();
     
     mobi_header = new MobiHeader;
     device->read((char *)mobi_header, sizeof(MobiHeader));
@@ -297,7 +296,7 @@ bool Mobi::sniff(QIODevice * d)
     device->read((char *)extsig, 4);
     if (strcmp(extsig, "EXTH") != 0)
     {
-        printf("Expected EXTH didn't find it [%s]\n", extsig);
+        qDebug("Expected EXTH didn't find it [%s]", extsig);
         return true;
     }
     
@@ -306,7 +305,7 @@ bool Mobi::sniff(QIODevice * d)
     device->read((char *)&num_records, 4);
     num_records = qFromBigEndian(num_records);
 
-    printf("%d EXTH records\n", num_records);
+    qDebug("%d EXTH records", num_records);
     
     for (unsigned int loopc=0; loopc<num_records; loopc++)
     {
@@ -327,7 +326,7 @@ bool Mobi::sniff(QIODevice * d)
     memset(fname, 0, mobi_header->full_name_length+1);
     device->seek(records[0].offset + mobi_header->full_name_offset);
     device->read(fname, mobi_header->full_name_length);
-    printf("Full name [%s]\n", fname);
+    qDebug("Full name [%s]", fname);
     fullname = QString(fname);
     delete[] fname;
 
@@ -358,7 +357,7 @@ void Mobi::open()
     BookDevice bd(this);
     if (bd.open(QIODevice::ReadOnly))
     {
-        printf("Opened device\n");
+        qDebug("Opened device");
     }
     QTextStream str(&bd);
 
@@ -380,7 +379,7 @@ void Mobi::open()
     BookDevice bd(this);
     if (bd.open(QIODevice::ReadOnly))
     {
-        printf("Opened device\n");
+        qDebug("Opened device");
     }
     
     QTextStream str(&bd);

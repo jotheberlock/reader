@@ -28,7 +28,7 @@ bool BookDevice::open(OpenMode om)
 
     QIODevice::open(om);
 
-    printf("Allowing open\n");
+    qDebug("Allowing open");
     
     return true;
 }
@@ -48,7 +48,7 @@ bool BookDevice::seek(qint64 pos)
 
 bool BookDevice::atEnd()
 {
-    printf("atEnd queried\n");
+    qDebug("atEnd queried");
     return (current_block == mobi->numBlocks());
 }
 
@@ -59,11 +59,11 @@ qint64 	BookDevice::bytesAvailable () const
 
 qint64 BookDevice::readData(char * data, qint64 maxSize)
 {
-    printf("Read attempt %lld\n", maxSize);
+    qDebug("Read attempt %lld", maxSize);
     
     if (current_block == mobi->numBlocks())
     {
-        printf("Bailing because of out of data\n");
+        qDebug("Bailing because of out of data");
         abort();
         return 0;
     } 
@@ -79,7 +79,7 @@ qint64 BookDevice::readData(char * data, qint64 maxSize)
             offset += maxSize;
             have_read += maxSize;
             pos += maxSize;
-            printf("Read %lld bytes\n", have_read);
+            qDebug("Read %lld bytes", have_read);
             
             return have_read;
         }
@@ -110,7 +110,7 @@ qint64 BookDevice::readData(char * data, qint64 maxSize)
         }
     }
 
-    printf("Bailing at end\n");
+    qDebug("Bailing at end");
     return 0;
 }
 

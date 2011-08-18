@@ -96,7 +96,7 @@ void Parser::handleTag(QString s)
         s = s.toLower();
         if (tags.size() == 0)
         {
-            printf("Got close tag [%s] without opening tag\n",
+            qDebug("Got close tag [%s] without opening tag",
                    s.toAscii().data());
         }
         
@@ -104,7 +104,7 @@ void Parser::handleTag(QString s)
     
         if (s != "/" + top->name)
         {
-            printf("Mismatched tag. [%s] [%s]\n",
+            qDebug("Mismatched tag. [%s] [%s]",
                    s.toAscii().data(), top->name.toAscii().data());
         }
 
@@ -206,7 +206,7 @@ void Parser::handleContent(QString s)
 {
     if (tags.size() == 0)
     {
-        printf("Content [%s] with no tag\n", s.toAscii().data()); 
+        qDebug("Content [%s] with no tag", s.toAscii().data()); 
         return;
     }
 
@@ -232,7 +232,7 @@ void Parser::handleContent(QString s)
 
 QString Parser::handleSpecialEntity(QString s)
 {
-    printf("Looking for entity [%s]\n", s.toAscii().data());
+    qDebug("Looking for entity [%s]", s.toAscii().data());
 
     if (s[0] == '#')
     {
@@ -253,7 +253,7 @@ QString Parser::handleSpecialEntity(QString s)
         if (ok)
         {
             QString sret = QChar(ret);
-            printf(">> Returning %d [%s]\n", ret, sret.toUtf8().data());
+            qDebug(">> Returning %d [%s]", ret, sret.toUtf8().data());
             return sret;
         }
         else
@@ -307,7 +307,7 @@ Element * Parser::next()
             {
                 if (accum != "")
                 {
-                    printf("Handlecontent for [%s] of [%s]\n",
+                    qDebug("Handlecontent for [%s] of [%s]",
                            tags.top()->name.toAscii().data(),
                            accum.toAscii().data());
                     handleContent(accum);
@@ -341,11 +341,11 @@ Element * Parser::next()
 
 void Parser::dumpTag(Tag * tag)
 {
-    printf("Name [%s] Contents [%s]\n",
+    qDebug("Name [%s] Contents [%s]",
            tag->name.toAscii().data(), tag->contents.toAscii().data());
     for (int loopc=0; loopc<tag->attributes.size();loopc++)
     {
-        printf("[%s] = [%s]\n",
+        qDebug("[%s] = [%s]",
                tag->attributes[loopc].name.toAscii().data(),
                tag->attributes[loopc].value.toAscii().data());
     }
@@ -370,12 +370,12 @@ void Parser::dumpTag(Tag * tag)
                 int pnum = tag->attributes[loopc].value.toInt(&ok);
                 if (!ok)
                 {
-                    printf("Can't parse image [%s]\n",
+                    qDebug("Can't parse image [%s]",
                            tag->attributes[loopc].value.toAscii().data());
                     break;
                 }
 
-                printf("Making image [%d]\n", pnum);
+                qDebug("Making image [%d]", pnum);
                 
                 QByteArray qba = mobi->readBlock(mobi->firstImage()+pnum-1);
                 QImage qi = QImage::fromData(qba, "GIF");
@@ -387,7 +387,7 @@ void Parser::dumpTag(Tag * tag)
                 }
                 else
                 {
-                    printf("Is null\n");
+                    qDebug("Is null");
                 }
             }
         }
@@ -398,6 +398,6 @@ void Parser::dumpStack()
 {
     for (int loopc=0; loopc<tags.size(); loopc++)
     {
-        printf("%d: [%s]\n", loopc, tags[loopc]->name.toAscii().data());
+        qDebug("%d: [%s]", loopc, tags[loopc]->name.toAscii().data());
     }
 }

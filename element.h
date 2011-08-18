@@ -13,6 +13,7 @@ class Element
     virtual bool render(QPaintDevice *, int x,int y, int w, int h,
                         int & dropout) = 0;
     virtual QRect size(int w) = 0;
+    virtual bool pageTerminator() = 0;
     
 };
 
@@ -50,6 +51,8 @@ class ParagraphElement : public Element
     virtual bool render(QPaintDevice *, int x,int y, int w, int h,
                         int & dropout);
 
+    virtual bool pageTerminator() { return false; } 
+    
     void addFragment(StringFragment s)
     {
         fragments.push_back(s);
@@ -79,12 +82,24 @@ class PictureElement : public Element
     virtual QRect size(int w);
     virtual bool render(QPaintDevice *, int x,int y, int w, int h,
                         int & dropout);
-
+    
+    virtual bool pageTerminator() { return false; }
+    
   protected:
 
     QPixmap pixmap;
 
 };
 
+class PagebreakElement : public Element
+{
+  public:
+    
+    virtual QRect size(int) { QRect rect; return rect; }
+    virtual bool render(QPaintDevice *, int,int,int,int, int &)
+    { return true; }
+    virtual bool pageTerminator() { return true; }
+    
+};
 
 #endif

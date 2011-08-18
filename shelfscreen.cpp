@@ -47,6 +47,8 @@ void Shelfscreen::update()
         element.image = new QLabel();
         if (mobi->firstImage() != -1)
         {
+            qDebug("Attempting to read image at block %d",
+                   mobi->firstImage());
             QByteArray qba = mobi->readBlock(mobi->firstImage());
             QImage qi = QImage::fromData(qba, "GIF");
             qi = qi.scaled(120, 120, Qt::KeepAspectRatio);
