@@ -24,6 +24,7 @@ void Shelfscreen::readSlot()
         ShelfElement & se = elements[loopc];
         if(se.text == sender())
         {
+            se.book->open();
             BookDevice * bd = new BookDevice(se.book);
             bd->open(QIODevice::ReadOnly);
             Parser * parser = new Parser(bd, se.book);
@@ -39,7 +40,7 @@ void Shelfscreen::update()
     for (int loopc=0; loopc<bookshelf->numBooks(); loopc++)
     {
         Mobi * mobi = bookshelf->getBook(loopc);
-
+        
         ShelfElement element;
         
         element.text = new QPushButton(mobi->getFullName());
@@ -50,7 +51,13 @@ void Shelfscreen::update()
             qDebug("Attempting to read image at block %d",
                    mobi->firstImage());
             QByteArray qba = mobi->readBlock(mobi->firstImage());
-            QImage qi = QImage::fromData(qba, "GIF");
+            const char * thedata = qba.data();
+            qDebug("[%c] [%c] [%c] [%c] [%c] [%c] [%c] [%c]",
+                   thedata[0], thedata[1], thedata[2],
+                   thedata[3],
+                   thedata[4], thedata[5], thedata[6],
+                   thedata[7]);
+            QImage qi = QImage::fromData(qba);
             qi = qi.scaled(120, 120, Qt::KeepAspectRatio);
             element.image->setPixmap(QPixmap::fromImage(qi));
         }

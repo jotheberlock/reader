@@ -37,10 +37,7 @@ class RecordData
     void swap();
     
     quint32 offset;
-    quint32 size;
-    quint32 unique_id;
-    unsigned char flags;
-    
+    quint32 bits;
 };
 
 class PalmdocHeader

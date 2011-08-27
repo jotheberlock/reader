@@ -9,6 +9,8 @@
 
 #include "bookdevice.h"
 
+// #define DEBUG_MOBI
+
 QString PDBHeader::makeDate(quint32 date)
 {
     QDateTime qds;
@@ -164,24 +166,62 @@ QByteArray Mobi::readBlock(int b)
 {
     QByteArray outbuf;
 
-    int size = records[b+1].offset-records[b].offset;
+    if (b > header->num_records)
+    {
+        qWarning("Failure to read invalid block %d", b);
+        return outbuf;
+    }
+        
+    int bsize;
     
-    char * buf = new char[size];
+#ifdef DEBUG_MOBI
+    qDebug("Read %d num records %d", b, header->num_records);
+#endif
+    
+    if (b == header->num_records)
+    {
+#ifdef DEBUG_MOBI
+        qDebug("Block %d is at %lld size is %d", b, records[b].offset,
+               device->size());
+#endif
+        bsize = device->size() - records[b].offset;
+    }
+    else
+    {
+#ifdef DEBUG_MOBI
+        qDebug("Compressed size %d %d", records[b].offset,
+               records[b+1].offset);
+#endif
+        bsize = records[b+1].offset-records[b].offset;
+    }
+    
+    if (bsize < 1)
+    {
+        qWarning("Silly block offset at %d %d %d %d", b,
+                 records[b].offset, records[b+1].offset, bsize);
+        return outbuf;
+    }
+    
+    char * buf = new char[bsize];; 
 
     if (palmdoc_header->compression == 1 ||
         (unsigned int)b >= mobi_header->first_non_book)
     {
+#ifdef DEBUG_MOBI
+        qDebug("Looking for uncompressed record %d at %lld size %d", b,
+               records[b].offset, bsize);
+#endif
         device->seek(records[b].offset);
-        device->read(buf, size);
-        outbuf = QByteArray(buf, size);
+        device->read(buf, bsize);
+        outbuf = QByteArray(buf, bsize);
     }
     else if (palmdoc_header->compression == 2)
     {
         device->seek(records[b].offset);
-        device->read(buf, size);
+        device->read(buf, bsize);
         
         unsigned char * inptr = (unsigned char *)buf;
-        unsigned char * endptr = (unsigned char *)buf+size;
+        unsigned char * endptr = (unsigned char *)buf+bsize;
         
         while (inptr < endptr)
         {
@@ -229,6 +269,7 @@ QByteArray Mobi::readBlock(int b)
         }
     }
 
+    delete buf;
     return outbuf;
 }
 
@@ -239,12 +280,23 @@ bool Mobi::sniff(QIODevice * d)
     device->read((char *)header, 78);
     header->swap();
 
-    records = new RecordData[header->num_records];
-
+    if (header->creator != 0x49424f4d)  // FourCC for MOBI
+    {
+        return false;
+    }
+    
+    records = new RecordData[header->num_records+1];
+    
+#ifdef DEBUG_MOBI
+    qDebug("%d records", header->num_records);
+#endif
     for (int loopc=0; loopc<header->num_records; loopc++)
     {
         device->read((char *)(&records[loopc]), 8);
         records[loopc].swap();
+#ifdef DEBUG_MOBI
+        qDebug("[%d] [%lu]", loopc, records[loopc].offset);
+#endif
     }
 
     palmdoc_header = new PalmdocHeader;
@@ -305,7 +357,9 @@ bool Mobi::sniff(QIODevice * d)
     device->read((char *)&num_records, 4);
     num_records = qFromBigEndian(num_records);
 
+#ifdef DEBUG_MOBI
     qDebug("%d EXTH records", num_records);
+#endif
     
     for (unsigned int loopc=0; loopc<num_records; loopc++)
     {
@@ -326,7 +380,9 @@ bool Mobi::sniff(QIODevice * d)
     memset(fname, 0, mobi_header->full_name_length+1);
     device->seek(records[0].offset + mobi_header->full_name_offset);
     device->read(fname, mobi_header->full_name_length);
+#ifdef DEBUG_MOBI
     qDebug("Full name [%s]", fname);
+#endif
     fullname = QString(fname);
     delete[] fname;
 
@@ -337,70 +393,19 @@ void Mobi::open()
 {
     unsigned int current_offset = 0;
     
-    for (unsigned int loopc=1; loopc<mobi_header->first_non_book; loopc++)
+    for (int loopc=1; loopc<palmdoc_header->record_count+1; loopc++)
     {
         QByteArray qba = readBlock(loopc);
         block_offsets.push_back(current_offset);
         current_offset += qba.size();
     }
+             
+    text_size = palmdoc_header->text_length;
 
-    text_size = current_offset;
-    
-        /*
-    QTextEdit * qte = new QTextEdit();
-
-    QPalette pal;
-    QColor fgColor("blue");
-    pal.setColor(QPalette::Text, fgColor);
-    qte->setPalette(pal);
-
-    BookDevice bd(this);
-    if (bd.open(QIODevice::ReadOnly))
-    {
-        qDebug("Opened device");
-    }
-    QTextStream str(&bd);
-
-    if (mobi_header->encoding == 1252)
-    {
-        str.setCodec("iso8859-1");
-    }
-    else
-    {
-        str.setCodec("UTF-8");
-    }
-
-    QString text = str.readAll();
-    qte->setHtml(text);
-    qte->show();
-        */
-
-        /*
-    BookDevice bd(this);
-    if (bd.open(QIODevice::ReadOnly))
-    {
-        qDebug("Opened device");
-    }
-    
-    QTextStream str(&bd);
-
-    if (mobi_header->encoding == 1252)
-    {
-        str.setCodec("iso8859-1");
-    }
-    else
-    {
-        str.setCodec("UTF-8");
-    }
-
-    QString text = str.readAll();
-    
-    QFile file("../book.html");
-    file.open(QIODevice::WriteOnly);
-    QTextStream qts(&file);
-    qts << text;
-    file.close();
-        */
+#ifdef DEBUG_MOBI
+    qDebug("Mobi open has %d blocks, total size %lld", block_offsets.size(),
+           text_size);
+#endif
 }
 
 

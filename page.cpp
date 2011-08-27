@@ -1,9 +1,13 @@
 #include <stdio.h>
 
+#include <QtCore/QFile>
+
 #include "page.h"
 #include "mobi.h"
 #include "parser.h"
 #include "shelfscreen.h"
+#include "pagebuttonbar.h"
+#include "bookdevice.h"
 
 #define DEBUG_LAYOUT
 
@@ -24,6 +28,9 @@ Page::Page(Mobi * m, Parser * p)
     }
 
     start_y = 0;
+
+    buttonbar = new PageButtonBar(this);
+    buttonbar->hide();
 }
 
 void Page::paintEvent(QPaintEvent *)
@@ -50,9 +57,20 @@ void Page::mousePressEvent(QMouseEvent * event)
     }
     else if (event->y() > height() - sensitive_zone_y)
     {
-        top_level->setCurrentIndex(0);
-        top_level->removeWidget(this);
-        delete this;
+        if (buttonbar->isVisible())
+        {
+            buttonbar->hide();
+        }
+        else
+        {
+            buttonbar->setGeometry(0, height() - sensitive_zone_y,
+                                   width(), sensitive_zone_y);
+            buttonbar->show();
+        }
+    }
+    else if (buttonbar->isVisible())
+    {
+        buttonbar->hide();
     }
 }
 
@@ -129,3 +147,25 @@ void Page::previousPage()
 {
 }
 
+void Page::backPushed()
+{
+    top_level->setCurrentIndex(0);
+    top_level->removeWidget(this);
+    delete this;
+}
+
+void Page::dumpPushed()
+{
+    QFile dump_file("bookdump.html");
+    if (!dump_file.open(QIODevice::WriteOnly))
+    {
+        qWarning("Could not open dump file");
+        return;
+    }
+    BookDevice bd(mobi);
+    bd.open(QIODevice::ReadOnly);
+
+    QByteArray bytes = bd.readAll();
+    dump_file.write(bytes);
+    dump_file.close();
+}

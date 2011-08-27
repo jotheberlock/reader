@@ -8,9 +8,12 @@
 
 class Mobi;
 class Parser;
+class PageButtonBar;
 
 class Page : public QWidget
 {
+    Q_OBJECT
+        
   public:
 
     Page(Mobi *, Parser *);
@@ -24,6 +27,11 @@ class Page : public QWidget
         elements.push_back(e);
     }
     
+  public slots:
+
+    void backPushed();
+    void dumpPushed();
+    
   protected:
 
     void nextPage();
@@ -36,6 +44,7 @@ class Page : public QWidget
     int end_y;
     Mobi * mobi;
     Parser * parser;
+    PageButtonBar * buttonbar;
     
 };
 

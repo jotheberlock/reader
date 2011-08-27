@@ -2,6 +2,8 @@
 #include "mobi.h"
 #include <stdio.h>
 
+#define DEBUG_DEVICE
+
 BookDevice::BookDevice(Mobi * m)
     : QIODevice()
 {
@@ -28,7 +30,9 @@ bool BookDevice::open(OpenMode om)
 
     QIODevice::open(om);
 
+#ifdef DEBUG_DEVICE    
     qDebug("Allowing open");
+#endif
     
     return true;
 }
@@ -48,23 +52,34 @@ bool BookDevice::seek(qint64 pos)
 
 bool BookDevice::atEnd()
 {
+#ifdef DEBUG_DEVICE    
     qDebug("atEnd queried");
+#endif
     return (current_block == mobi->numBlocks());
 }
 
 qint64 	BookDevice::bytesAvailable () const
 {
-    return size-pos + QIODevice::bytesAvailable();
+    qint64 ret = size-pos + QIODevice::bytesAvailable();
+#ifdef DEBUG_DEVICE    
+    qDebug("Returning %lld bytes available, size %lld pos %lld iodevice %lld",
+           ret, size, pos, QIODevice::bytesAvailable());
+#endif
+    return (ret > 0) ? ret : 0;
 }
 
 qint64 BookDevice::readData(char * data, qint64 maxSize)
 {
-    qDebug("Read attempt %lld", maxSize);
+#ifdef DEBUG_DEVICE    
+    qDebug("Read attempt %lld current block %d numblocks %d size %lld pos %lld",
+           maxSize, current_block, mobi->numBlocks(), size, pos);
+#endif
     
-    if (current_block == mobi->numBlocks())
+    if (current_block > mobi->numBlocks())
     {
+#ifdef DEBUG_DEVICE    
         qDebug("Bailing because of out of data");
-        abort();
+#endif
         return 0;
     } 
 
@@ -79,7 +94,9 @@ qint64 BookDevice::readData(char * data, qint64 maxSize)
             offset += maxSize;
             have_read += maxSize;
             pos += maxSize;
+#ifdef DEBUG_DEVICE    
             qDebug("Read %lld bytes", have_read);
+#endif
             
             return have_read;
         }
@@ -93,9 +110,17 @@ qint64 BookDevice::readData(char * data, qint64 maxSize)
             
             have_read += partial_read;
             pos += partial_read;
-                
-            if (current_block == mobi->numBlocks())
+
+#ifdef DEBUG_DEVICE    
+            qDebug("Block increment, %d %d", current_block,
+                   mobi->numBlocks());
+#endif
+            
+            if (current_block > mobi->numBlocks())
             {
+#ifdef DEBUG_DEVICE    
+                qDebug("Short read %lld", have_read);
+#endif
                 return have_read;
             }
             else
@@ -110,7 +135,9 @@ qint64 BookDevice::readData(char * data, qint64 maxSize)
         }
     }
 
+#ifdef DEBUG_DEVICE    
     qDebug("Bailing at end");
+#endif
     return 0;
 }
 

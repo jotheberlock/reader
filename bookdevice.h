@@ -21,7 +21,7 @@ class BookDevice : public QIODevice
     virtual qint64 	bytesAvailable () const;
     virtual bool open(OpenMode);
     virtual bool isSequential() const
-    { return true; }
+    { return false; }
     virtual bool reset();
     virtual bool seek(qint64);
     virtual bool atEnd();
