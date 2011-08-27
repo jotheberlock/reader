@@ -27,6 +27,8 @@ class Page : public QWidget
         elements.push_back(e);
     }
     
+    void setPage(int p);
+    
   public slots:
 
     void backPushed();
@@ -40,8 +42,8 @@ class Page : public QWidget
     void layoutElements();
     QList<Element *> elements;
 
-    int start_y;
-    int end_y;
+    qint64 current_page;
+    
     Mobi * mobi;
     Parser * parser;
     PageButtonBar * buttonbar;

@@ -359,8 +359,13 @@ void Parser::dumpTag(Tag * tag)
         
         in_paragraph = false;
     }
-
-    if (tag->name == "img")
+    else if(false /*tag->name == "mbp:pagebreak"*/)
+    {
+        PagebreakElement * pe = new PagebreakElement;
+        element = pe;
+        continuing = false;
+    } 
+    else if (tag->name == "img")
     {    
         for (int loopc=0; loopc<tag->attributes.size();loopc++)
         {

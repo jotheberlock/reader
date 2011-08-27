@@ -10,10 +10,30 @@ class Element
 {
   public:
 
+    Element()
+    {
+        current_position = 0;
+        current_height = 0;
+    }
+
+    virtual ~Element()
+    {
+    }
+    
     virtual bool render(QPaintDevice *, int x,int y, int w, int h,
                         int & dropout) = 0;
-    virtual QRect size(int w) = 0;
+    virtual QRect size(int w, int downpage, int pageheight) = 0;
     virtual bool pageTerminator() = 0;
+
+    qint64 position()  { return current_position; }
+    void setPosition(qint64 p) { current_position = p; }
+    qint64 height() { return current_height; }
+    void setHeight(qint64 h) { current_height = h; }
+    
+  protected:
+
+    qint64 current_position;
+    qint64 current_height;
     
 };
 
@@ -47,7 +67,7 @@ class ParagraphElement : public Element
         font = QFont("Times New Roman", 12);
     }
     
-    virtual QRect size(int w);
+    virtual QRect size(int w, int downpage, int pageheight);
     virtual bool render(QPaintDevice *, int x,int y, int w, int h,
                         int & dropout);
 
@@ -79,7 +99,7 @@ class PictureElement : public Element
         pixmap = QPixmap::fromImage(i);
     }
 
-    virtual QRect size(int w);
+    virtual QRect size(int w, int downpage, int pageheight);
     virtual bool render(QPaintDevice *, int x,int y, int w, int h,
                         int & dropout);
     
@@ -95,7 +115,7 @@ class PagebreakElement : public Element
 {
   public:
     
-    virtual QRect size(int) { QRect rect; return rect; }
+    virtual QRect size(int w, int downpage, int pageheight);
     virtual bool render(QPaintDevice *, int,int,int,int, int &)
     { return true; }
     virtual bool pageTerminator() { return true; }

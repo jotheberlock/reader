@@ -2,6 +2,7 @@
 #define _BOOKSHELF_
 
 #include <QtCore/QList>
+#include <QtCore/QSettings>
 
 #include "mobi.h"
 
@@ -20,5 +21,6 @@ class Bookshelf
 };
 
 extern Bookshelf * bookshelf;
+extern QSettings * settings;
 
 #endif

@@ -13,11 +13,13 @@
 
 Bookshelf * bookshelf;
 QStackedWidget * top_level;
+QSettings * settings;
 
 int main(int argc, char ** argv)
 {
     QApplication app(argc, argv);
 
+    settings = new QSettings("Joel Dillon", "Calliope eReader");
     bookshelf = new Bookshelf;
 
     QString docs_path;
@@ -38,5 +40,12 @@ int main(int argc, char ** argv)
     top_level->addWidget(qsa);
     top_level->show();
 
+    QString cbook = settings->value("currentbook").toString();
+    int cpage = settings->value("currentpage").toInt();
+    if (shelfscreen->readBook(cbook))
+    {
+        shelfscreen->currentPage()->setPage(cpage);
+    }
+    
     app.exec();
 }

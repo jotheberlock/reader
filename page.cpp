@@ -27,7 +27,7 @@ Page::Page(Mobi * m, Parser * p)
         qDebug("No image");
     }
 
-    start_y = 0;
+    current_page = 0;
 
     buttonbar = new PageButtonBar(this);
     buttonbar->hide();
@@ -76,12 +76,14 @@ void Page::mousePressEvent(QMouseEvent * event)
 
 void Page::layoutElements()
 {
-    int y = start_y;
-
+    int y = -(current_page * height());
+    int current_y = y;
+    
 #ifdef DEBUG_LAYOUT    
     qDebug("Start y %d", y);
 #endif
 
+    
     int loopc = 0;
     
     while (true)
@@ -98,36 +100,34 @@ void Page::layoutElements()
         }
         
         Element * e = elements.at(loopc);
-
-        if (e->pageTerminator())
-        {
-            break;
-        }
         
-        QRect size = e->size(width());
+        QRect size = e->size(width(), current_y, height());
 
         int dropout = 0;
+
+#ifdef DEBUG_LAYOUT
+        qDebug("Render %d %d %d", current_y, width(), height());
+#endif
         
-        e->render(this, 0, y, width(), height(), dropout);
+        e->render(this, 0, current_y, width(), height(), dropout);
         
 #ifdef DEBUG_LAYOUT    
-        qDebug("At %d widget height %d item height %d dropout %d\n", y,
+        qDebug("At %d widget height %d item height %d dropout %d\n", current_y,
                height(), size.height(), dropout);
 #endif        
-        if (y+size.height() > height())
+        if (current_y+size.height() > height())
         {
             int dropdiff = (height()-y) - dropout;
-            end_y = -start_y + (height() - dropdiff);
             
 #ifdef DEBUG_LAYOUT    
-            qDebug("Stopped rendering at %d, dropout %d, dropdiff %d, end_y %d",
-                   y, dropout, dropdiff, end_y);
+            qDebug("Stopped rendering at %d, height was %d, dropout %d, dropdiff %d",
+                   y, size.height(), dropout, dropdiff);
 #endif
             break;
         }
         else
         {
-            y += size.height();
+            current_y += size.height();
         }
 
         loopc++;
@@ -139,16 +139,33 @@ void Page::nextPage()
 #ifdef DEBUG_LAYOUT
     qDebug("\nNext page\n");
 #endif
-    start_y = -end_y;
+    current_page++;
+    settings->setValue("currentpage", current_page);
+    settings->sync();
     update();
 }
 
 void Page::previousPage()
 {
+    current_page--;
+    settings->setValue("currentpage", current_page);
+    settings->sync();
+    update();
+}
+
+void Page::setPage(int p)
+{
+    current_page = p;
+    settings->setValue("currentpage", current_page);
+    settings->sync();
+    update();
 }
 
 void Page::backPushed()
 {
+    settings->setValue("currentbook", "");
+    settings->setValue("currentpage", 0);
+    settings->sync();
     top_level->setCurrentIndex(0);
     top_level->removeWidget(this);
     delete this;

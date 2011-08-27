@@ -4,11 +4,12 @@
 #include <QtGui/QPainter>
 #include <QtGui/QFontMetrics>
 
-QRect ParagraphElement::size(int w)
+QRect ParagraphElement::size(int w, int downpage, int pageheight)
 {
     int xx = 20;
     int yy = 0;
-
+    int pos = downpage;
+    
     int linespacing = 0;
     
     for (int fcount=0; fcount<fragments.size(); fcount++)
@@ -32,6 +33,13 @@ QRect ParagraphElement::size(int w)
             {
                 xx = 0;
                 yy += qfm.lineSpacing();
+                pos += qfm.lineSpacing();
+                
+                if (pos + qfm.lineSpacing() > pageheight)
+                {
+                    yy += (pageheight - pos);
+                    pos = 0;
+                }            
             }
 
             xx += rect.width();
@@ -93,7 +101,7 @@ bool ParagraphElement::render(QPaintDevice * d, int x,int y, int w, int h,
     return false;
 }
 
-QRect PictureElement::size(int w)
+QRect PictureElement::size(int w, int downpage, int pageheight)
 {
     double scale = ((double)w) / ((double)pixmap.width());
 
@@ -127,3 +135,10 @@ bool PictureElement::render(QPaintDevice * d, int x,int y, int w, int h,
     return true;
 }
 
+QRect PagebreakElement::size(int w, int downpage, int pageheight)
+{
+    QRect r;
+    r.setWidth(w);
+    r.setHeight(pageheight-downpage);
+    return r;
+}

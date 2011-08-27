@@ -10,6 +10,7 @@ Shelfscreen::Shelfscreen()
     quit_button = new QPushButton("Quit");
     connect(quit_button, SIGNAL(clicked()), this, SLOT(quitSlot()));
     layout = new QGridLayout(this);
+    current_page = 0;
 }
 
 void Shelfscreen::quitSlot()
@@ -25,14 +26,43 @@ void Shelfscreen::readSlot()
         if(se.text == sender())
         {
             se.book->open();
+            settings->setValue("currentbook", se.book->getFullName());
+            settings->setValue("currentpage", 0);
+            settings->sync();
             BookDevice * bd = new BookDevice(se.book);
             bd->open(QIODevice::ReadOnly);
             Parser * parser = new Parser(bd, se.book);
             Page * page = new Page(se.book, parser);
             top_level->addWidget(page);
-            top_level->setCurrentWidget(page);            
+            top_level->setCurrentWidget(page);
+            current_page = page;
         }
     }   
+}
+
+bool Shelfscreen::readBook(QString book)
+{
+    for (int loopc=0; loopc<elements.size(); loopc++)
+    {
+        ShelfElement & se = elements[loopc];
+        if(se.book->getFullName() == book)
+        {
+            se.book->open();
+            settings->setValue("currentbook", book);
+            settings->setValue("currentpage", 0);
+            settings->sync();
+            BookDevice * bd = new BookDevice(se.book);
+            bd->open(QIODevice::ReadOnly);
+            Parser * parser = new Parser(bd, se.book);
+            Page * page = new Page(se.book, parser);
+            top_level->addWidget(page);
+            top_level->setCurrentWidget(page);
+            current_page = page;
+            return true;
+        }
+    }
+    
+    return false;  
 }
 
 void Shelfscreen::update()

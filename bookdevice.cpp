@@ -58,7 +58,7 @@ bool BookDevice::atEnd()
     return (current_block == mobi->numBlocks());
 }
 
-qint64 	BookDevice::bytesAvailable () const
+qint64 BookDevice::bytesAvailable () const
 {
     qint64 ret = size-pos + QIODevice::bytesAvailable();
 #ifdef DEBUG_DEVICE    

@@ -8,6 +8,8 @@
 
 #include "bookshelf.h"
 
+class Page;
+
 class ShelfElement
 {
   public:
@@ -31,7 +33,10 @@ class Shelfscreen : public QWidget
 
     void quitSlot();
     void readSlot();
-    
+    bool readBook(QString);
+
+    Page * currentPage()  { return current_page; }
+        
     QSize minimumSize() const
     {
         return layout->minimumSize();
@@ -42,6 +47,7 @@ class Shelfscreen : public QWidget
     QGridLayout * layout;
     QList<ShelfElement> elements;
     QPushButton * quit_button;
+    Page * current_page;
     
 };
 
