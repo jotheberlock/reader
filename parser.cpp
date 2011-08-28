@@ -8,6 +8,7 @@ Parser::Parser(QIODevice * d, Mobi * m)
     stream = new QTextStream(d);
     element = 0;
     in_paragraph = false;
+    in_special_entity = false;
     
     if (mobi->encoding() == 1252)
     {
@@ -102,6 +103,7 @@ void Parser::reset()
     stream = new QTextStream(device);
     element = 0;
     in_paragraph = false;    
+    in_special_entity = false;
 }
 
 void Parser::handleTag(QString s)
@@ -351,7 +353,9 @@ Element * Parser::next()
         }
     }
 
-    return element;
+    Element * ret = element;
+    element = 0;
+    return ret;
 }
 
 void Parser::dumpTag(Tag * tag)
@@ -367,10 +371,17 @@ void Parser::dumpTag(Tag * tag)
     
     if (tag->name == "p")
     {
-        if (((ParagraphElement *)element)->numFragments() > 0)
+        if (element)
         {
-            continuing = false;
+            if (((ParagraphElement *)element)->numFragments() > 0)
+            {
+                continuing = false;
+            }
         }
+        else
+        {
+            qWarning("Null paragraph element");
+        } 
         
         in_paragraph = false;
     }

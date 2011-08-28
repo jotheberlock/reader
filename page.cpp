@@ -82,7 +82,6 @@ void Page::layoutElements()
 #ifdef DEBUG_LAYOUT    
     qDebug("Start y %d", y);
 #endif
-
     
     int loopc = 0;
     
@@ -102,16 +101,15 @@ void Page::layoutElements()
         Element * e = elements.at(loopc);
         
         QRect size = e->size(width(), current_y, height());
-/*
+        
         if (current_y + size.height() < 0)
         {
                 // Not visible on screen
-            elements.removeAt(loopc);
+            elements.removeFirst();
             current_y += size.height();
             delete e;
             continue;
         }
-*/      
         int dropout = 0;
 
 #ifdef DEBUG_LAYOUT
@@ -158,18 +156,19 @@ void Page::previousPage()
 {
     if (current_page > 0)
     {
-    setPage(current_page-1);
+        setPage(current_page-1);
     }
 }
 
 void Page::setPage(int p)
 {
-    parser->reset();
     for (int loopc=0; loopc<elements.size(); loopc++)
     {
-            //delete elements[loopc];
+        delete elements[loopc];
     }
     elements.clear();
+    
+    parser->reset();
     
     current_page = p;
     settings->setValue("currentpage", current_page);
