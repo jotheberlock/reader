@@ -23,11 +23,8 @@ bool BookDevice::open(OpenMode om)
         return false;
     }
 
-    pos = 0;
-    offset = 0;
-    current_block = 1;
-    block_data = mobi->readBlock(1);
-
+    reset_internal();
+    
     QIODevice::open(om);
 
 #ifdef DEBUG_DEVICE    
@@ -39,15 +36,80 @@ bool BookDevice::open(OpenMode om)
 
 bool BookDevice::reset()
 {
+    reset_internal();
     QIODevice::reset();
-    pos = 0;
     return true;
 }
 
-bool BookDevice::seek(qint64 pos)
+bool BookDevice::seek(qint64 seekTo)
 {
+    reset_internal();
+
+        // To seek we re-read from the beginning - it's not a common
+        // operation and to do otherwise would require indexing the book
+        // on startup.
+        // This is a modified form of readData
+
+    qint64 have_read = 0;
+    
+    while (seekTo >= 0)
+    {
+        if (seekTo < (block_data.size() - offset))
+        {
+            offset += seekTo;
+            have_read += seekTo;
+            pos += seekTo;
+#ifdef DEBUG_DEVICE    
+            qDebug("Seek %lld bytes", have_read);
+#endif
+            
+            return have_read;
+        }
+        else
+        {
+            int partial_read = (block_data.size() - offset);
+            current_block++;
+            
+            have_read += partial_read;
+            pos += partial_read;
+
+#ifdef DEBUG_DEVICE    
+            qDebug("Seek block increment, %d %d", current_block,
+                   mobi->numBlocks());
+#endif
+            
+            if (current_block > mobi->numBlocks())
+            {
+#ifdef DEBUG_DEVICE    
+                qDebug("Short seek %lld", have_read);
+#endif
+                return true;
+            }
+            else
+            {
+                block_data = mobi->readBlock(current_block);
+                offset = 0;
+            } 
+
+            seekTo -= partial_read;
+            pos += partial_read;
+        }
+    }
+
+#ifdef DEBUG_DEVICE    
+    qDebug("Bailing at end");
+#endif
+    
     QIODevice::seek(pos);
     return true;
+}
+
+void BookDevice::reset_internal()
+{
+    pos = 0;
+    offset = 0;
+    current_block = 1;
+    block_data = mobi->readBlock(1);
 }
 
 bool BookDevice::atEnd()

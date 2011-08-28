@@ -76,23 +76,12 @@ void Shelfscreen::update()
         element.text = new QPushButton(mobi->getFullName());
         connect(element.text, SIGNAL(clicked()), this, SLOT(readSlot()));
         element.image = new QLabel();
-        if (mobi->firstImage() != -1)
-        {
-            qDebug("Attempting to read image at block %d",
-                   mobi->firstImage());
-            QByteArray qba = mobi->readBlock(mobi->firstImage());
-            const char * thedata = qba.data();
-            qDebug("[%c] [%c] [%c] [%c] [%c] [%c] [%c] [%c]",
-                   thedata[0], thedata[1], thedata[2],
-                   thedata[3],
-                   thedata[4], thedata[5], thedata[6],
-                   thedata[7]);
-            QImage qi = QImage::fromData(qba);
-            qi = qi.scaled(120, 120, Qt::KeepAspectRatio);
-            element.image->setPixmap(QPixmap::fromImage(qi));
-        }
+        QImage qi = mobi->bookCover();
+        qi = qi.scaled(120, 120, Qt::KeepAspectRatio);
+        element.image->setPixmap(QPixmap::fromImage(qi));
         layout->addWidget(element.image, loopc, 0);
         layout->addWidget(element.text, loopc, 1);
+        layout->setRowStretch(loopc, 1);
         element.book = mobi;
         elements.push_back(element);
     }

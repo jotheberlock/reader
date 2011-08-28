@@ -31,6 +31,8 @@ class BookDevice : public QIODevice
     virtual qint64 readData(char * data, qint64 maxSize);
     virtual qint64 writeData(const char * data, qint64 maxSize);
 
+    void reset_internal();
+    
     qint64 size;
     Mobi * mobi;
     qint64 pos;

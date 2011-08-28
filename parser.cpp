@@ -89,6 +89,21 @@ Parser::Parser(QIODevice * d, Mobi * m)
     special_entities["oelig"] = QChar(0x0153);
 }
 
+void Parser::reset()
+{
+    device->reset();
+    for (int loopc=0; loopc<tags.size(); loopc++)
+    {
+        delete tags[loopc];
+    }
+    tags.clear();
+
+    delete stream;
+    stream = new QTextStream(device);
+    element = 0;
+    in_paragraph = false;    
+}
+
 void Parser::handleTag(QString s)
 {
     if (s[0] == '/')

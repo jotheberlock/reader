@@ -276,12 +276,18 @@ QByteArray Mobi::readBlock(int b)
 bool Mobi::sniff(QIODevice * d)
 {
     device = d;
+    if (!device->open(QIODevice::ReadOnly))
+    {
+        return false;
+    }
+    
     header = new PDBHeader;
     device->read((char *)header, 78);
     header->swap();
 
     if (header->creator != 0x49424f4d)  // FourCC for MOBI
     {
+        device->close();
         return false;
     }
     
@@ -309,16 +315,19 @@ bool Mobi::sniff(QIODevice * d)
     device->read((char *)mobisig, 4);
     if (strcmp(mobisig, "MOBI") != 0)
     {
+        device->close();
         return false;
     }
 
     if (palmdoc_header->encryption != 0)
     {
+        device->close();
         return false;
     }
 
     if (palmdoc_header->compression != 1 && palmdoc_header->compression != 2)
     {
+        device->close();
         return false;
     }
     
@@ -332,12 +341,14 @@ bool Mobi::sniff(QIODevice * d)
 
     if (mobi_header->drm_offset != 0xffffffff)
     {
+        device->close();
         return false;
     }
     
     if (!mobi_header->exth_flags & 0x40)
     {
-        return true;
+        device->close();
+        goto finished;
     }
     
     char buf[4096];
@@ -349,7 +360,8 @@ bool Mobi::sniff(QIODevice * d)
     if (strcmp(extsig, "EXTH") != 0)
     {
         qDebug("Expected EXTH didn't find it [%s]", extsig);
-        return true;
+        device->close();
+        goto finished;
     }
     
     device->read((char *)extsig, 4);
@@ -376,6 +388,8 @@ bool Mobi::sniff(QIODevice * d)
         exth_records.push_back(etr);
     }
 
+  finished:
+    
     char * fname = new char[mobi_header->full_name_length+1];
     memset(fname, 0, mobi_header->full_name_length+1);
     device->seek(records[0].offset + mobi_header->full_name_offset);
@@ -386,26 +400,25 @@ bool Mobi::sniff(QIODevice * d)
     fullname = QString(fname);
     delete[] fname;
 
+    text_size = palmdoc_header->text_length;
+    
+    if (firstImage() != -1)
+    {
+#ifdef DEBUG_MOBI
+        qDebug("Attempting to read image at block %d",
+               firstImage());
+#endif
+        QByteArray qba = readBlock(firstImage());
+        book_cover = QImage::fromData(qba);
+    }
+            
+    device->close();
     return true;
 }
 
 void Mobi::open()
 {
-    unsigned int current_offset = 0;
-    
-    for (int loopc=1; loopc<palmdoc_header->record_count+1; loopc++)
-    {
-        QByteArray qba = readBlock(loopc);
-        block_offsets.push_back(current_offset);
-        current_offset += qba.size();
-    }
-             
-    text_size = palmdoc_header->text_length;
-
-#ifdef DEBUG_MOBI
-    qDebug("Mobi open has %d blocks, total size %lld", block_offsets.size(),
-           text_size);
-#endif
+    device->open(QIODevice::ReadOnly);
 }
 
 

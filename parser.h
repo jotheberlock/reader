@@ -38,6 +38,8 @@ class Parser
 
     void dumpTag(Tag *);
     void dumpStack();
+
+    void reset();
     
   protected:
     

@@ -16,7 +16,6 @@ void Bookshelf::scanDirectory(QString d)
     {
         QString fname = dir.absoluteFilePath(entries[loopc]);
         QFile * file = new QFile(fname);
-        file->open(QIODevice::ReadOnly);
             
         Mobi * mobi = new Mobi;
         if (mobi->sniff(file))

@@ -3,6 +3,7 @@
 
 #include <QtCore/QDataStream>
 #include <QtCore/QVector>
+#include <QtGui/QImage>
 
 class PDBHeader
 {
@@ -113,11 +114,9 @@ class Mobi
 
     int numBlocks()
     {
-        return block_offsets.size();
+        return palmdoc_header->record_count;
     }
     
-    unsigned int blockOffset(int i)
-        { return block_offsets[i]; }  // Uncompressed
     QByteArray readBlock(int);
     int firstImage()
     {
@@ -143,6 +142,8 @@ class Mobi
     {
         return fullname;
     }
+
+    QImage bookCover() { return book_cover; }
     
   protected:
     
@@ -156,8 +157,8 @@ class Mobi
     PalmdocHeader * palmdoc_header;
     MobiHeader * mobi_header;
     QList <ExthRecord *> exth_records;
-    QVector<unsigned int> block_offsets;
     qint64 text_size;
+    QImage book_cover;
     
 };
 
