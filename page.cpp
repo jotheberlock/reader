@@ -28,7 +28,8 @@ Page::Page(Mobi * m, Parser * p)
     }
 
     current_page = 0;
-
+    highest_y = 0;
+    
     buttonbar = new PageButtonBar(this);
     buttonbar->hide();
 }
@@ -76,7 +77,7 @@ void Page::mousePressEvent(QMouseEvent * event)
 
 void Page::layoutElements()
 {
-    int y = -(current_page * height());
+    int y = -(current_page * height())+highest_y;
     int current_y = y;
     
 #ifdef DEBUG_LAYOUT    
@@ -107,6 +108,7 @@ void Page::layoutElements()
                 // Not visible on screen
             elements.removeFirst();
             current_y += size.height();
+            highest_y = e->position();
             delete e;
             continue;
         }
@@ -117,7 +119,8 @@ void Page::layoutElements()
 #endif
         
         e->render(this, 0, current_y, width(), height(), dropout);
-        
+        e->setPosition(current_y);
+            
 #ifdef DEBUG_LAYOUT    
         qDebug("At %d widget height %d item height %d dropout %d\n", current_y,
                height(), size.height(), dropout);
@@ -171,6 +174,7 @@ void Page::setPage(int p)
     parser->reset();
     
     current_page = p;
+    highest_y = 0;
     settings->setValue("currentpage", current_page);
     settings->sync();
     update();

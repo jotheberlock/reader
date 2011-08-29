@@ -4,6 +4,21 @@
 
 #define DEBUG_DEVICE
 
+// This class subclasses QIODevice, providing a similar interface
+// to classes such as QFile and QBuffer for the book text of the Mobipocket
+// file (which is typically compressed). It's read-only; providing write
+// access to the data is both unnecessary and complicated.
+
+// A tradeoff is that while the device gives the appearance of full random
+// access, seek()ing actually throws away all current state and re-reads
+// the file from the beginning. It would be possible to make this more
+// efficient by indexing each Mobi section with its position within the
+// uncompressed stream, but this would require reading through the entire
+// book at startup. Since seek()ing is a rare event, I thought it better to
+// skip the startup delay; it should only impact performance when going to
+// the previous page. It would also be possible to optimise seeking forward
+// from the current position, but currently there is no need.
+
 BookDevice::BookDevice(Mobi * m)
     : QIODevice()
 {
@@ -36,7 +51,7 @@ bool BookDevice::open(OpenMode om)
 
 bool BookDevice::seek(qint64 seekTo)
 {
-    QIODevice::seek(pos);
+    QIODevice::seek(seekTo);
     reset_internal();
 
         // To seek we re-read from the beginning - it's not a common
@@ -57,7 +72,7 @@ bool BookDevice::seek(qint64 seekTo)
             qDebug("Seek %lld bytes", have_read);
 #endif
             
-            return have_read;
+            return true;
         }
         else
         {

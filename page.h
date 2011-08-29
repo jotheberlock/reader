@@ -43,6 +43,7 @@ class Page : public QWidget
     QList<Element *> elements;
 
     qint64 current_page;
+    qint64 highest_y;
     
     Mobi * mobi;
     Parser * parser;
