@@ -49,6 +49,86 @@ bool BookDevice::open(OpenMode om)
     return true;
 }
 
+// Mobipocket's usual compression format is documented here -
+// http://wiki.mobileread.com/wiki/PalmDOC#Reading_PalmDOC
+qint64 BookDevice::readData(char * data, qint64 maxSize)
+{
+#ifdef DEBUG_DEVICE    
+    qDebug("Read attempt %lld current block %d numblocks %d size %lld pos %lld",
+           maxSize, current_block, mobi->numBlocks(), size, pos);
+#endif
+    
+    if (current_block > mobi->numBlocks())
+    {
+#ifdef DEBUG_DEVICE    
+        qDebug("Bailing because of out of data");
+#endif
+        return 0;
+    } 
+
+    qint64 have_read = 0;
+    
+    while (maxSize >= 0)
+    {
+        if (maxSize < (block_data.size() - offset))
+        {
+            char * ptr = block_data.data();
+            memcpy(data, ptr+offset, maxSize);
+            offset += maxSize;
+            have_read += maxSize;
+            pos += maxSize;
+#ifdef DEBUG_DEVICE    
+            qDebug("Read %lld bytes", have_read);
+#endif
+            
+            return have_read;
+        }
+        else
+        {
+            char * ptr = block_data.data();
+
+            int partial_read = (block_data.size() - offset);
+            memcpy(data, ptr+offset, partial_read);
+            current_block++;
+            
+            have_read += partial_read;
+            pos += partial_read;
+
+#ifdef DEBUG_DEVICE    
+            qDebug("Block increment, %d %d", current_block,
+                   mobi->numBlocks());
+#endif
+            
+            if (current_block > mobi->numBlocks())
+            {
+#ifdef DEBUG_DEVICE    
+                qDebug("Short read %lld", have_read);
+#endif
+                return have_read;
+            }
+            else
+            {
+                block_data = mobi->readBlock(current_block);
+                offset = 0;
+            } 
+            
+            data += partial_read;
+            maxSize -= partial_read;
+            pos += partial_read;
+        }
+    }
+
+#ifdef DEBUG_DEVICE    
+    qDebug("Bailing at end");
+#endif
+    return 0;
+}
+
+qint64 BookDevice::writeData(const char *, qint64)
+{
+    return -1;
+}
+
 bool BookDevice::seek(qint64 seekTo)
 {
     QIODevice::seek(seekTo);
@@ -137,82 +217,5 @@ qint64 BookDevice::bytesAvailable () const
     return (ret > 0) ? ret : 0;
 }
 
-qint64 BookDevice::readData(char * data, qint64 maxSize)
-{
-#ifdef DEBUG_DEVICE    
-    qDebug("Read attempt %lld current block %d numblocks %d size %lld pos %lld",
-           maxSize, current_block, mobi->numBlocks(), size, pos);
-#endif
-    
-    if (current_block > mobi->numBlocks())
-    {
-#ifdef DEBUG_DEVICE    
-        qDebug("Bailing because of out of data");
-#endif
-        return 0;
-    } 
-
-    qint64 have_read = 0;
-    
-    while (maxSize >= 0)
-    {
-        if (maxSize < (block_data.size() - offset))
-        {
-            char * ptr = block_data.data();
-            memcpy(data, ptr+offset, maxSize);
-            offset += maxSize;
-            have_read += maxSize;
-            pos += maxSize;
-#ifdef DEBUG_DEVICE    
-            qDebug("Read %lld bytes", have_read);
-#endif
-            
-            return have_read;
-        }
-        else
-        {
-            char * ptr = block_data.data();
-
-            int partial_read = (block_data.size() - offset);
-            memcpy(data, ptr+offset, partial_read);
-            current_block++;
-            
-            have_read += partial_read;
-            pos += partial_read;
-
-#ifdef DEBUG_DEVICE    
-            qDebug("Block increment, %d %d", current_block,
-                   mobi->numBlocks());
-#endif
-            
-            if (current_block > mobi->numBlocks())
-            {
-#ifdef DEBUG_DEVICE    
-                qDebug("Short read %lld", have_read);
-#endif
-                return have_read;
-            }
-            else
-            {
-                block_data = mobi->readBlock(current_block);
-                offset = 0;
-            } 
-            
-            data += partial_read;
-            maxSize -= partial_read;
-            pos += partial_read;
-        }
-    }
-
-#ifdef DEBUG_DEVICE    
-    qDebug("Bailing at end");
-#endif
-    return 0;
-}
-
-qint64 BookDevice::writeData(const char *, qint64)
-{
-    return -1;
-}
 
 
