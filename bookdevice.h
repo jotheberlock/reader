@@ -22,7 +22,6 @@ class BookDevice : public QIODevice
     virtual bool open(OpenMode);
     virtual bool isSequential() const
     { return false; }
-    virtual bool reset();
     virtual bool seek(qint64);
     virtual bool atEnd();
     

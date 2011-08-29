@@ -34,15 +34,9 @@ bool BookDevice::open(OpenMode om)
     return true;
 }
 
-bool BookDevice::reset()
-{
-    reset_internal();
-    QIODevice::reset();
-    return true;
-}
-
 bool BookDevice::seek(qint64 seekTo)
 {
+    QIODevice::seek(pos);
     reset_internal();
 
         // To seek we re-read from the beginning - it's not a common
@@ -99,8 +93,6 @@ bool BookDevice::seek(qint64 seekTo)
 #ifdef DEBUG_DEVICE    
     qDebug("Bailing at end");
 #endif
-    
-    QIODevice::seek(pos);
     return true;
 }
 
