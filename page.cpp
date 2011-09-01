@@ -29,6 +29,7 @@ Page::Page(Mobi * m, Parser * p)
     }
 
     current_page = 0;
+    next_y = 0;
     
     buttonbar = new PageButtonBar(this);
     buttonbar->hide();
@@ -113,7 +114,7 @@ void Page::findElements()
     qDebug("\nFinding elements, page %lld", current_page);
         
     qint64 top_y = current_page * height();
-
+    
     bool keep_going = false;
 
     qDebug("Top y is %lld height %d", top_y, height());
@@ -190,13 +191,14 @@ void Page::findElements()
 
         // Now keep reading elements til we go offscreen
     
-    qint64 track_y = top_y;
+    qint64 track_y = next_y;
     while (true)
     {
         Element * tmp = parser->next();
         if (tmp == 0)
         {
             qDebug("Ran out of elements");
+            next_y = track_y;
             return;
         }
         
@@ -212,6 +214,7 @@ void Page::findElements()
         {
             qDebug("Bailing, %lld > %lld + %d", track_y, top_y, height());
                 // Reached last visible element, time to bail
+            next_y = track_y;
             return;
         }
     }
