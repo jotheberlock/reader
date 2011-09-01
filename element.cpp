@@ -34,12 +34,14 @@ QRect ParagraphElement::size(int w, int downpage, int pageheight)
                 xx = 0;
                 yy += qfm.lineSpacing();
                 pos += qfm.lineSpacing();
-                
+
+                    /*
                 if (pos + qfm.lineSpacing() > pageheight)
                 {
                     yy += (pageheight - pos);
                     pos = 0;
-                }            
+                    }
+                    */       
             }
 
             xx += rect.width();
@@ -84,11 +86,13 @@ bool ParagraphElement::render(QPaintDevice * d, int x,int y, int w, int h,
                 xx = x;
                 yy += qfm.lineSpacing();
 
+                    /*
                 if (yy + qfm.lineSpacing() > h)
                 {
                     dropout = yy - y;
                     return true;
-                }            
+                    }
+                    */      
             }
 
             p.drawText(xx, yy+qfm.ascent(), str);

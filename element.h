@@ -29,11 +29,14 @@ class Element
     void setPosition(qint64 p) { current_position = p; }
     qint64 height() { return current_height; }
     void setHeight(qint64 h) { current_height = h; }
+    qint64 number() { return element_number; }
+    void setNumber(qint64 n) { element_number = n; }
     
   protected:
 
     qint64 current_position;
     qint64 current_height;
+    qint64 element_number;
     
 };
 

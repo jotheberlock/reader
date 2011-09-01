@@ -83,6 +83,8 @@ void Page::layoutElements()
     for (int loopc=0; loopc<elements.size(); loopc++)
     {
         Element * e = elements[loopc];
+        qDebug("Rendering %lld %lld (%lld) %d", e->number(), e->position(),
+               top_y + e->position(), e->height());
         e->render(this, 0, top_y + e->position(), width(), height(), dropout);
         top_y += e->height();
     }
@@ -107,7 +109,7 @@ void Page::findElements()
     bool keep_going = false;
 
     qDebug("Top y is %lld height %d", top_y, height());
-    
+
     do 
     {
         keep_going = false;

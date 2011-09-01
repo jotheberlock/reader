@@ -62,6 +62,7 @@ class Parser
 
     Element * element;
     Mobi * mobi;
+    qint64 next_element;
     
 };
 

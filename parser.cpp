@@ -105,6 +105,7 @@ void Parser::reset()
     element = 0;
     in_paragraph = false;    
     in_special_entity = false;
+    next_element = 0;
 }
 
 void Parser::handleTag(QString s)
@@ -208,6 +209,8 @@ void Parser::handleTag(QString s)
         if (top->name == "p")
         {
             element = new ParagraphElement;
+            element->setNumber(next_element++);
+            
             in_paragraph = true;
         }
 
@@ -396,6 +399,7 @@ void Parser::dumpTag(Tag * tag)
     {
         PagebreakElement * pe = new PagebreakElement;
         element = pe;
+        element->setNumber(next_element++);
         continuing = false;
     } 
     else if (tag->name == "img")
@@ -421,6 +425,7 @@ void Parser::dumpTag(Tag * tag)
                 {
                     PictureElement * pe = new PictureElement(qi);
                     element = pe;
+                    element->setNumber(next_element++);
                     continuing = false;
                 }
                 else
