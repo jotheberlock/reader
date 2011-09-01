@@ -42,9 +42,16 @@ int main(int argc, char ** argv)
 
     QString cbook = settings->value("currentbook").toString();
     int cpage = settings->value("currentpage").toInt();
+    int w = settings->value("width").toInt();
+    int h = settings->value("height").toInt();
     if (shelfscreen->readBook(cbook))
     {
         shelfscreen->currentPage()->setPage(cpage);
+    }
+
+    if (w > 0 && h > 0)
+    {
+        top_level->resize(w,h);
     }
     
     app.exec();

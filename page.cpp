@@ -1,6 +1,7 @@
 #include <stdio.h>
 
 #include <QtCore/QFile>
+#include <QtGui/QPainter>
 
 #include "page.h"
 #include "mobi.h"
@@ -40,6 +41,8 @@ void Page::paintEvent(QPaintEvent *)
 
 void Page::resizeEvent(QResizeEvent *)
 {
+    settings->setValue("width", width());
+    settings->setValue("height", height());
     findElements();
     update();
 }
@@ -79,14 +82,19 @@ void Page::layoutElements()
 {
     qint64 top_y = -(current_page * height());
     
+    qDebug("Layout out elements, top_y %lld", top_y);
+    
     int dropout = 0;
     for (int loopc=0; loopc<elements.size(); loopc++)
     {
         Element * e = elements[loopc];
-        qDebug("Rendering %lld %lld (%lld) %d", e->number(), e->position(),
+        qDebug("Rendering %lld %lld (%lld) %lld", e->number(), e->position(),
                top_y + e->position(), e->height());
+
+        QPainter p(this);
+        p.fillRect(0, top_y + e->position(), width(), e->height(),
+                   loopc % 2 ? QColor(255,200,200) : QColor(200,255,200));
         e->render(this, 0, top_y + e->position(), width(), height(), dropout);
-        top_y += e->height();
     }
 }
 
