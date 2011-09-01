@@ -40,6 +40,7 @@ void Page::paintEvent(QPaintEvent *)
 
 void Page::resizeEvent(QResizeEvent *)
 {
+    findElements();
     update();
 }
 
@@ -99,6 +100,8 @@ void Page::clearElements()
 
 void Page::findElements()
 {
+    qDebug("\nFinding elements, page %lld", current_page);
+        
     qint64 top_y = current_page * height();
 
     bool keep_going = false;
@@ -138,6 +141,7 @@ void Page::findElements()
     if (elements.size() == 0 || elements[0]->position() > top_y)
     {
         qDebug("Resetting and finding first element");
+        clearElements();
         
             // Need to read up to that point
         parser->reset();
@@ -175,9 +179,10 @@ void Page::findElements()
     }
 
         // Now keep reading elements til we go offscreen
+    
+    qint64 track_y = top_y;
     while (true)
     {
-        qint64 track_y = top_y;
         Element * tmp = parser->next();
         if (tmp == 0)
         {
@@ -193,9 +198,9 @@ void Page::findElements()
         elements.push_back(tmp);
         qDebug("Read new element %lld %lld", tmp->position(), tmp->height());
         
-        if(track_y+size.height() > top_y + height())
+        if(track_y > top_y + height())
         {
-            qDebug("Bailing");
+            qDebug("Bailing, %lld > %lld + %d", track_y, top_y, height());
                 // Reached last visible element, time to bail
             return;
         }
