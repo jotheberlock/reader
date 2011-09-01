@@ -1,5 +1,6 @@
 #include "parser.h"
 
+// #define DEBUG_PARSER
 Parser::Parser(QIODevice * d, Mobi * m)
 {
     device = d;
@@ -249,8 +250,10 @@ void Parser::handleContent(QString s)
 
 QString Parser::handleSpecialEntity(QString s)
 {
+#ifdef DEBUG_PARSER    
     qDebug("Looking for entity [%s]", s.toAscii().data());
-
+#endif
+    
     if (s[0] == '#')
     {
         bool ok;
@@ -324,9 +327,11 @@ Element * Parser::next()
             {
                 if (accum != "")
                 {
+#ifdef DEBUG_PARSER                    
                     qDebug("Handlecontent for [%s] of [%s]",
                            tags.top()->name.toAscii().data(),
                            accum.toAscii().data());
+#endif
                     handleContent(accum);
                 }
                 accum = "";
@@ -360,6 +365,7 @@ Element * Parser::next()
 
 void Parser::dumpTag(Tag * tag)
 {
+#ifdef DEBUG_PARSER
     qDebug("Name [%s] Contents [%s]",
            tag->name.toAscii().data(), tag->contents.toAscii().data());
     for (int loopc=0; loopc<tag->attributes.size();loopc++)
@@ -368,6 +374,7 @@ void Parser::dumpTag(Tag * tag)
                tag->attributes[loopc].name.toAscii().data(),
                tag->attributes[loopc].value.toAscii().data());
     }
+#endif
     
     if (tag->name == "p")
     {

@@ -28,7 +28,6 @@ Page::Page(Mobi * m, Parser * p)
     }
 
     current_page = 0;
-    highest_y = 0;
     
     buttonbar = new PageButtonBar(this);
     buttonbar->hide();
@@ -77,82 +76,135 @@ void Page::mousePressEvent(QMouseEvent * event)
 
 void Page::layoutElements()
 {
-    int y = -(current_page * height())+highest_y;
-    int current_y = y;
+    qint64 top_y = -(current_page * height());
     
-#ifdef DEBUG_LAYOUT    
-    qDebug("Start y %d", y);
-#endif
-    
-    int loopc = 0;
-    
-    while (true)
+    int dropout = 0;
+    for (int loopc=0; loopc<elements.size(); loopc++)
     {
-        while (loopc >= elements.size())
+        Element * e = elements[loopc];
+        e->render(this, 0, top_y + e->position(), width(), height(), dropout);
+        top_y += e->height();
+    }
+}
+
+void Page::clearElements()
+{
+    for (int loopc=0; loopc<elements.size(); loopc++)
+    {
+        delete elements[loopc];
+    }
+    elements.clear();
+    next_y = 0;
+}
+
+void Page::findElements()
+{
+    qint64 top_y = current_page * height();
+
+    bool keep_going = false;
+
+    qDebug("Top y is %lld height %d", top_y, height());
+    
+    do 
+    {
+        keep_going = false;
+            // Remove anything offscreen
+        for (int loopc=0; loopc<elements.size(); loopc++)
+        {
+            Element * e = elements[loopc];
+            if (e->position() + e->height() < top_y)
+            {
+                qDebug("Purging before element at %lld %lld",
+                       e->position(), e->height());
+                delete e;
+                elements.removeAt(loopc);
+                keep_going = true;
+                break;
+            }
+            else if (e->position() > top_y + height())
+            {
+                qDebug("Purging after element at %lld %lld",
+                       e->position(), e->height());
+                delete e;
+                elements.removeAt(loopc);
+                keep_going = true;
+                break;
+            }
+        }
+    }
+    while (keep_going);
+    
+        // Verify that first element stored is before the page
+    if (elements.size() == 0 || elements[0]->position() > top_y)
+    {
+        qDebug("Resetting and finding first element");
+        
+            // Need to read up to that point
+        parser->reset();
+        qint64 track_y = 0;
+        while (true)
         {
             Element * tmp = parser->next();
             if (tmp == 0)
             {
+                qDebug("Ran out of elements finding first element");
                 return;
             }
 
-            elements.push_back(tmp);
-        }
-        
-        Element * e = elements.at(loopc);
-        
-        QRect size = e->size(width(), current_y, height());
-        
-        if (current_y + size.height() < 0)
-        {
-                // Not visible on screen
-            elements.removeFirst();
-            current_y += size.height();
-            highest_y = e->position();
-            delete e;
-            continue;
-        }
-        int dropout = 0;
-
-#ifdef DEBUG_LAYOUT
-        qDebug("Render %d %d %d", current_y, width(), height());
-#endif
-        
-        e->render(this, 0, current_y, width(), height(), dropout);
-        e->setPosition(current_y);
+            QRect size = tmp->size(width(), track_y % height(), height());
             
-#ifdef DEBUG_LAYOUT    
-        qDebug("At %d widget height %d item height %d dropout %d\n", current_y,
-               height(), size.height(), dropout);
-#endif        
-        if (current_y+size.height() > height())
-        {
-            int dropdiff = (height()-y) - dropout;
+            qDebug("Element is %lld %d, top_y %lld", track_y, size.height(),
+                   top_y);
             
-#ifdef DEBUG_LAYOUT    
-            qDebug("Stopped rendering at %d, height was %d, dropout %d, dropdiff %d",
-                   y, size.height(), dropout, dropdiff);
-#endif
-            break;
+            if(track_y+size.height() > top_y)
+            {
+                qDebug("Found first element %lld %d", track_y, size.height());
+                    // Reached first visible element, time to bail
+                tmp->setPosition(track_y);
+                tmp->setHeight(size.height());
+                next_y = track_y + size.height();
+                elements.push_back(tmp);
+                break;
+            }
+            else
+            {
+                track_y += size.height();
+                delete tmp;
+            }
         }
-        else
-        {
-            current_y += size.height();
-        }
+    }
 
-        loopc++;
+        // Now keep reading elements til we go offscreen
+    while (true)
+    {
+        qint64 track_y = top_y;
+        Element * tmp = parser->next();
+        if (tmp == 0)
+        {
+            qDebug("Ran out of elements");
+            return;
+        }
+        
+        QRect size = tmp->size(width(), track_y % height(), height());
+        tmp->setPosition(track_y);
+        tmp->setHeight(size.height());
+        track_y += size.height();
+
+        elements.push_back(tmp);
+        qDebug("Read new element %lld %lld", tmp->position(), tmp->height());
+        
+        if(track_y+size.height() > top_y + height())
+        {
+            qDebug("Bailing");
+                // Reached last visible element, time to bail
+            return;
+        }
     }
 }
 
 void Page::nextPage()
 {
-#ifdef DEBUG_LAYOUT
-    qDebug("\nNext page\n");
-#endif
-    current_page++;
-    settings->setValue("currentpage", current_page);
-    settings->sync();
-    update();
+    setPage(current_page+1);
 }
 
 void Page::previousPage()
@@ -164,17 +216,9 @@ void Page::previousPage()
 }
 
 void Page::setPage(int p)
-{
-    for (int loopc=0; loopc<elements.size(); loopc++)
-    {
-        delete elements[loopc];
-    }
-    elements.clear();
-    
-    parser->reset();
-    
+{   
     current_page = p;
-    highest_y = 0;
+    findElements();
     settings->setValue("currentpage", current_page);
     settings->sync();
     update();

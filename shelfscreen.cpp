@@ -34,6 +34,7 @@ void Shelfscreen::readSlot()
             Parser * parser = new Parser(bd, se.book);
             Page * page = new Page(se.book, parser);
             top_level->addWidget(page);
+            page->setPage(0);
             top_level->setCurrentWidget(page);
             current_page = page;
         }
@@ -56,6 +57,7 @@ bool Shelfscreen::readBook(QString book)
             Parser * parser = new Parser(bd, se.book);
             Page * page = new Page(se.book, parser);
             top_level->addWidget(page);
+            page->setPage(0);
             top_level->setCurrentWidget(page);
             current_page = page;
             return true;

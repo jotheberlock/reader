@@ -40,10 +40,13 @@ class Page : public QWidget
     void previousPage();
     
     void layoutElements();
+    void findElements();
+    void clearElements();
+    
     QList<Element *> elements;
 
     qint64 current_page;
-    qint64 highest_y;
+    qint64 next_y;
     
     Mobi * mobi;
     Parser * parser;

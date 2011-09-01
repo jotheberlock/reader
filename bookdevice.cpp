@@ -2,7 +2,7 @@
 #include "mobi.h"
 #include <stdio.h>
 
-#define DEBUG_DEVICE
+// #define DEBUG_DEVICE
 
 // This class subclasses QIODevice, providing a similar interface
 // to classes such as QFile and QBuffer for the book text of the Mobipocket
