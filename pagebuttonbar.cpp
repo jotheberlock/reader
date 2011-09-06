@@ -8,6 +8,10 @@ PageButtonBar::PageButtonBar(Page * p)
 
     back = new QPushButton("Back");
     dump = new QPushButton("Dump");
+
+    back->setObjectName("backbutton");
+    dump->setObjectName("dumpbutton");
+    
     QHBoxLayout * layout = new QHBoxLayout;
     layout->addWidget(back);
     layout->addWidget(dump);

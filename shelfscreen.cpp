@@ -76,6 +76,7 @@ void Shelfscreen::update()
         ShelfElement element;
         
         element.text = new QPushButton(mobi->getFullName());
+        element.text->setObjectName("titlebutton");
         connect(element.text, SIGNAL(clicked()), this, SLOT(readSlot()));
         element.image = new QLabel();
         QImage qi = mobi->bookCover();
