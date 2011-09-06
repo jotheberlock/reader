@@ -1,6 +1,8 @@
 #include "bookshelf.h"
 
 #include <QtCore/QDir>
+#include <QtCore/QTextStream>
+#include <QtGui/QApplication>
 
 void Bookshelf::scanDirectory(QString d)
 {
@@ -30,6 +32,21 @@ void Bookshelf::scanDirectory(QString d)
             delete file;
         }
     }
+
+        // Check for stylesheet
+    QFile stylefile(dir.absoluteFilePath("calliope.css"));
+    if (stylefile.exists())
+    {
+        if (stylefile.open(QIODevice::ReadOnly))
+        {
+            qDebug("Applying stylesheet");
+            QTextStream in(&stylefile);
+            QString sheet = in.readAll();
+            stylefile.close();
+            qApp->setStyleSheet(sheet);
+        }
+    }
+    
 }
 
 Mobi * Bookshelf::getBook(int index)

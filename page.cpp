@@ -82,19 +82,23 @@ void Page::mousePressEvent(QMouseEvent * event)
 void Page::layoutElements()
 {
     qint64 top_y = -(current_page * height());
-    
+
+#ifdef DEBUG_LAYOUT    
     qDebug("Layout out elements, top_y %lld", top_y);
+#endif
     
     int dropout = 0;
     for (int loopc=0; loopc<elements.size(); loopc++)
     {
         Element * e = elements[loopc];
+#ifdef DEBUG_LAYOUT
         qDebug("Rendering %lld %lld (%lld) %lld", e->number(), e->position(),
                top_y + e->position(), e->height());
 
         QPainter p(this);
         p.fillRect(0, top_y + e->position(), width(), e->height(),
                    loopc % 2 ? QColor(255,200,200) : QColor(200,255,200));
+#endif
         e->render(this, 0, top_y + e->position(), width(), height(), dropout);
     }
 }
@@ -110,15 +114,19 @@ void Page::clearElements()
 }
 
 void Page::findElements()
-{
+{    
+#ifdef DEBUG_LAYOUT
     qDebug("\nFinding elements, page %lld", current_page);
-        
+#endif
+    
     qint64 top_y = current_page * height();
     
     bool keep_going = false;
-
+    
+#ifdef DEBUG_LAYOUT
     qDebug("Top y is %lld height %d", top_y, height());
-
+#endif
+    
     do 
     {
         keep_going = false;
@@ -128,8 +136,10 @@ void Page::findElements()
             Element * e = elements[loopc];
             if (e->position() + e->height() < top_y)
             {
+#ifdef DEBUG_LAYOUT
                 qDebug("Purging before element at %lld %lld",
                        e->position(), e->height());
+#endif
                 delete e;
                 elements.removeAt(loopc);
                 keep_going = true;
@@ -137,8 +147,10 @@ void Page::findElements()
             }
             else if (e->position() > top_y + height())
             {
+#ifdef DEBUG_LAYOUT
                 qDebug("Purging after element at %lld %lld",
                        e->position(), e->height());
+#endif
                 delete e;
                 elements.removeAt(loopc);
                 keep_going = true;
@@ -151,7 +163,9 @@ void Page::findElements()
         // Verify that first element stored is before the page
     if (elements.size() == 0 || elements[0]->position() > top_y)
     {
+#ifdef DEBUG_LAYOUT
         qDebug("Resetting and finding first element");
+#endif
         clearElements();
         
             // Need to read up to that point
@@ -162,18 +176,24 @@ void Page::findElements()
             Element * tmp = parser->next();
             if (tmp == 0)
             {
+#ifdef DEBUG_LAYOUT
                 qDebug("Ran out of elements finding first element");
+#endif
                 return;
             }
 
             QRect size = tmp->size(width(), track_y % height(), height());
             
+#ifdef DEBUG_LAYOUT
             qDebug("Element is %lld %d, top_y %lld", track_y, size.height(),
                    top_y);
+#endif
             
             if(track_y+size.height() > top_y)
             {
+#ifdef DEBUG_LAYOUT
                 qDebug("Found first element %lld %d", track_y, size.height());
+#endif
                     // Reached first visible element, time to bail
                 tmp->setPosition(track_y);
                 tmp->setHeight(size.height());
@@ -208,11 +228,15 @@ void Page::findElements()
         track_y += size.height();
 
         elements.push_back(tmp);
+#ifdef DEBUG_LAYOUT
         qDebug("Read new element %lld %lld", tmp->position(), tmp->height());
+#endif
         
         if(track_y > top_y + height())
         {
+#ifdef DEBUG_LAYOUT
             qDebug("Bailing, %lld > %lld + %d", track_y, top_y, height());
+#endif
                 // Reached last visible element, time to bail
             next_y = track_y;
             return;
