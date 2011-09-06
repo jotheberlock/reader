@@ -102,6 +102,16 @@ void Parser::reset()
 
     delete stream;
     stream = new QTextStream(device);
+
+    if (mobi->encoding() == 1252)
+    {
+        stream->setCodec("iso8859-1");
+    }
+    else
+    {
+        stream->setCodec("UTF-8");
+    }
+    
     element = 0;
     in_paragraph = false;    
     in_special_entity = false;
