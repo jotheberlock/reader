@@ -67,7 +67,7 @@ bool ParagraphElement::render(QPaintDevice * d, int x,int y, int w, int h,
     {
         StringFragment sf = fragments.at(fcount);
         font.setItalic(sf.is_italic);
-        font.setBold(sf.is_bold);
+        font.setBold(true /*sf.is_bold*/);
 
         QFontMetrics qfm(font);
         qfm = QFontMetrics(font);
