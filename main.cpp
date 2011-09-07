@@ -18,7 +18,10 @@ QSettings * settings;
 int main(int argc, char ** argv)
 {
     QApplication app(argc, argv);
-
+    QFont font("Droid Sans");
+    font.setBold(true);
+    app.setFont(font);
+    
     settings = new QSettings("Joel Dillon", "Calliope eReader");
     bookshelf = new Bookshelf;
 
@@ -28,13 +31,12 @@ int main(int argc, char ** argv)
     bookshelf->scanDirectory("/sdcard/kindle");
     
     Shelfscreen * shelfscreen = new Shelfscreen;
+    
     shelfscreen->update();
     shelfscreen->resize(480,640);
         //shelfscreen->resize(shelfscreen->minimumSize());
     QScrollArea * qsa = new QScrollArea;
     qsa->setWidget(shelfscreen);
-
-    app.setStyleSheet("QPushButton { text-align: left; }");
      
     top_level = new QStackedWidget;
     top_level->addWidget(qsa);

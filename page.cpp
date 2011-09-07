@@ -10,7 +10,7 @@
 #include "pagebuttonbar.h"
 #include "bookdevice.h"
 
-#define DEBUG_LAYOUT
+// #define DEBUG_LAYOUT
 
 Page::Page(Mobi * m, Parser * p)
 {

@@ -2,7 +2,7 @@
 #include "mobi.h"
 #include <stdio.h>
 
-#define DEBUG_DEVICE
+// #define DEBUG_DEVICE
 
 // This class subclasses QIODevice, providing a similar interface
 // to classes such as QFile and QBuffer for the book text of the Mobipocket
@@ -137,7 +137,8 @@ bool BookDevice::seek(qint64 seekTo)
         // To seek we re-read from the beginning - it's not a common
         // operation and to do otherwise would require indexing the book
         // on startup.
-        // This is a modified form of readData
+        // This is a modified form of readData and should probably be
+        // refactored into a single internal method
 
     qint64 have_read = 0;
     

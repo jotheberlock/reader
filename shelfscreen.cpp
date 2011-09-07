@@ -8,6 +8,7 @@
 Shelfscreen::Shelfscreen()
 {
     quit_button = new QPushButton("Quit");
+    quit_button->setObjectName("quitbutton");
     connect(quit_button, SIGNAL(clicked()), this, SLOT(quitSlot()));
     layout = new QGridLayout(this);
     current_page = 0;
