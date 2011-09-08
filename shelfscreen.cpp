@@ -9,6 +9,7 @@ Shelfscreen::Shelfscreen()
 {
     quit_button = new QPushButton("Quit");
     quit_button->setObjectName("quitbutton");
+    quit_button->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     connect(quit_button, SIGNAL(clicked()), this, SLOT(quitSlot()));
     layout = new QGridLayout(this);
     current_page = 0;
@@ -78,6 +79,8 @@ void Shelfscreen::update()
         
         element.text = new QPushButton(mobi->getFullName());
         element.text->setObjectName("titlebutton");
+        element.text->setSizePolicy(QSizePolicy::Expanding,
+                                    QSizePolicy::Expanding);
         connect(element.text, SIGNAL(clicked()), this, SLOT(readSlot()));
         element.image = new QLabel();
         QImage qi = mobi->bookCover();
@@ -90,5 +93,6 @@ void Shelfscreen::update()
         elements.push_back(element);
     }
 
-    layout->addWidget(quit_button, bookshelf->numBooks(), 0, 1, 2);
+    layout->addWidget(quit_button, bookshelf->numBooks(), 1);
+    layout->setRowStretch(bookshelf->numBooks(), 1);
 }

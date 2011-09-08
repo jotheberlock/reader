@@ -9,6 +9,9 @@ PageButtonBar::PageButtonBar(Page * p)
     back = new QPushButton("Back");
     dump = new QPushButton("Dump");
 
+    back->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    dump->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
     back->setObjectName("backbutton");
     dump->setObjectName("dumpbutton");
     
