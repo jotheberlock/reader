@@ -3,6 +3,9 @@
 
 #include <QtGui/QWidget>
 #include <QtGui/QMouseEvent>
+#include <QtGui/QToolBar>
+#include <QtGui/QMenuBar>
+#include <QtGui/QAction>
 
 #include "element.h"
 
@@ -43,6 +46,9 @@ class Page : public QWidget
     void findElements();
     void clearElements();
     
+    int pageStart();
+    int pageHeight();
+
     QList<Element *> elements;
 
     qint64 current_page;
@@ -50,8 +56,9 @@ class Page : public QWidget
     
     Mobi * mobi;
     Parser * parser;
-    PageButtonBar * buttonbar;
-    
+    QToolBar * buttonbar;
+    QMenuBar * menubar;
+
 };
 
 #endif

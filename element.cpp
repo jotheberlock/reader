@@ -16,7 +16,7 @@ QRect ParagraphElement::size(int w, int downpage, int pageheight)
     {
         StringFragment sf = fragments.at(fcount);
         font.setItalic(sf.is_italic);
-        font.setBold(true /*sf.is_bold*/);
+        font.setBold(sf.is_bold);
         
         QFontMetrics qfm(font);
         qfm = QFontMetrics(font);
@@ -35,13 +35,13 @@ QRect ParagraphElement::size(int w, int downpage, int pageheight)
                 yy += qfm.lineSpacing();
                 pos += qfm.lineSpacing();
 
-                    /*
+                    // Next line would overflow so we skip to
+                    // the next page
                 if (pos + qfm.lineSpacing() > pageheight)
                 {
                     yy += (pageheight - pos);
                     pos = 0;
-                    }
-                    */       
+                }
             }
 
             xx += rect.width();
@@ -52,8 +52,7 @@ QRect ParagraphElement::size(int w, int downpage, int pageheight)
     return QRect(0,0,w,yy+linespacing);
 }
 
-bool ParagraphElement::render(QPaintDevice * d, int x,int y, int w, int h,
-                              int & dropout)
+bool ParagraphElement::render(QPaintDevice * d, int x,int y, int w, int h)
 {
     int xx = x + 20;
     int yy = y;
@@ -67,7 +66,7 @@ bool ParagraphElement::render(QPaintDevice * d, int x,int y, int w, int h,
     {
         StringFragment sf = fragments.at(fcount);
         font.setItalic(sf.is_italic);
-        font.setBold(true /*sf.is_bold*/);
+        font.setBold(sf.is_bold);
 
         QFontMetrics qfm(font);
         qfm = QFontMetrics(font);
@@ -86,13 +85,11 @@ bool ParagraphElement::render(QPaintDevice * d, int x,int y, int w, int h,
                 xx = x;
                 yy += qfm.lineSpacing();
 
-                    /*
                 if (yy + qfm.lineSpacing() > h)
                 {
-                    dropout = yy - y;
+                        // Next line would overflow, so we skip it
                     return true;
-                    }
-                    */      
+                }
             }
 
             p.drawText(xx, yy+qfm.ascent(), str);
@@ -115,8 +112,7 @@ QRect PictureElement::size(int w, int downpage, int pageheight)
                 (int)(scale * pixmap.height()));
 }
 
-bool PictureElement::render(QPaintDevice * d, int x,int y, int w, int h,
-                            int & dropout)
+bool PictureElement::render(QPaintDevice * d, int x,int y, int w, int h)
 {
     if (pixmap.width() < 1 || pixmap.height() < 1)
     {
@@ -125,11 +121,6 @@ bool PictureElement::render(QPaintDevice * d, int x,int y, int w, int h,
     
     double scale = ((double)w-x) / ((double)pixmap.width());
     int length = (int)(((double)pixmap.height()) * scale);
-
-    if (y+length > h)
-    {
-        dropout = h-y;
-    }
     
     QPainter p;
     p.begin(d);

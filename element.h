@@ -20,8 +20,7 @@ class Element
     {
     }
     
-    virtual bool render(QPaintDevice *, int x,int y, int w, int h,
-                        int & dropout) = 0;
+    virtual bool render(QPaintDevice *, int x,int y, int w, int h) = 0;
     virtual QRect size(int w, int downpage, int pageheight) = 0;
     virtual bool pageTerminator() = 0;
 
@@ -37,7 +36,7 @@ class Element
     qint64 current_position;
     qint64 current_height;
     qint64 element_number;
-    
+
 };
 
 class StringFragment
@@ -67,12 +66,11 @@ class ParagraphElement : public Element
 
     ParagraphElement()
     {
-        font = QFont("Times New Roman", 12);
+        font = QFont("Times New Roman", 24);
     }
     
     virtual QRect size(int w, int downpage, int pageheight);
-    virtual bool render(QPaintDevice *, int x,int y, int w, int h,
-                        int & dropout);
+    virtual bool render(QPaintDevice *, int x,int y, int w, int h);
 
     virtual bool pageTerminator() { return false; } 
     
@@ -103,8 +101,7 @@ class PictureElement : public Element
     }
 
     virtual QRect size(int w, int downpage, int pageheight);
-    virtual bool render(QPaintDevice *, int x,int y, int w, int h,
-                        int & dropout);
+    virtual bool render(QPaintDevice *, int x,int y, int w, int h);
     
     virtual bool pageTerminator() { return false; }
     
@@ -119,7 +116,7 @@ class PagebreakElement : public Element
   public:
     
     virtual QRect size(int w, int downpage, int pageheight);
-    virtual bool render(QPaintDevice *, int,int,int,int, int &)
+    virtual bool render(QPaintDevice *, int,int,int,int)
     { return true; }
     virtual bool pageTerminator() { return true; }
     

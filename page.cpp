@@ -7,10 +7,9 @@
 #include "mobi.h"
 #include "parser.h"
 #include "shelfscreen.h"
-#include "pagebuttonbar.h"
 #include "bookdevice.h"
 
-// #define DEBUG_LAYOUT
+#define DEBUG_LAYOUT
 
 Page::Page(Mobi * m, Parser * p)
 {
@@ -31,7 +30,23 @@ Page::Page(Mobi * m, Parser * p)
     current_page = 0;
     next_y = 0;
     
-    buttonbar = new PageButtonBar(this);
+    buttonbar = new QToolBar(this);
+    QAction * back_action = new QAction(QIcon(":/images/back.png"), "Back", this);
+    QAction * dump_action = new QAction(QIcon(":/images/dump.png"), "Dump", this);
+    buttonbar->addAction(back_action);
+    buttonbar->addAction(dump_action);
+#if !defined(ANDROID)
+    menubar = new QMenuBar(this);
+    QMenu * menu = menubar->addMenu("&Menu");
+    menu->addAction(back_action);
+    menu->addAction(dump_action);
+    menubar->setAutoFillBackground(true);
+#else
+    menubar = 0;
+#endif
+    connect(back_action, SIGNAL(triggered()), this, SLOT(backPushed()));
+    connect(dump_action, SIGNAL(triggered()), this, SLOT(dumpPushed()));
+    buttonbar->setAutoFillBackground(true);
     buttonbar->hide();
 }
 
@@ -42,8 +57,21 @@ void Page::paintEvent(QPaintEvent *)
 
 void Page::resizeEvent(QResizeEvent *)
 {
+    if (buttonbar->isVisible())
+    {
+        int sensitive_zone_y = height() / 10;
+        buttonbar->setGeometry(0, height() - sensitive_zone_y,
+                               width(), sensitive_zone_y);
+    }
+
+    if (menubar)
+    {
+        menubar->setGeometry(0, 0, width(), menubar->height());
+    }
+
     settings->setValue("width", width());
     settings->setValue("height", height());
+    clearElements();
     findElements();
     update();
 }
@@ -81,13 +109,13 @@ void Page::mousePressEvent(QMouseEvent * event)
 
 void Page::layoutElements()
 {
-    qint64 top_y = -(current_page * height());
+    qint64 top_y = -(current_page * pageHeight());
+    top_y += pageStart();
 
 #ifdef DEBUG_LAYOUT    
     qDebug("Layout out elements, top_y %lld", top_y);
 #endif
-    
-    int dropout = 0;
+
     for (int loopc=0; loopc<elements.size(); loopc++)
     {
         Element * e = elements[loopc];
@@ -99,7 +127,8 @@ void Page::layoutElements()
         p.fillRect(0, top_y + e->position(), width(), e->height(),
                    loopc % 2 ? QColor(255,200,200) : QColor(200,255,200));
 #endif
-        e->render(this, 0, top_y + e->position(), width(), height(), dropout);
+            // Render happens in real coordinates
+        e->render(this, 0, top_y + e->position(), width(), pageHeight());
     }
 }
 
@@ -119,12 +148,12 @@ void Page::findElements()
     qDebug("\nFinding elements, page %lld", current_page);
 #endif
     
-    qint64 top_y = current_page * height();
+    qint64 top_y = current_page * pageHeight();
     
     bool keep_going = false;
     
 #ifdef DEBUG_LAYOUT
-    qDebug("Top y is %lld height %d", top_y, height());
+    qDebug("Top y is %lld height %d", top_y, pageHeight());
 #endif
     
     do 
@@ -145,7 +174,7 @@ void Page::findElements()
                 keep_going = true;
                 break;
             }
-            else if (e->position() > top_y + height())
+            else if (e->position() > top_y + pageHeight())
             {
 #ifdef DEBUG_LAYOUT
                 qDebug("Purging after element at %lld %lld",
@@ -182,7 +211,7 @@ void Page::findElements()
                 return;
             }
 
-            QRect size = tmp->size(width(), track_y % height(), height());
+            QRect size = tmp->size(width(), track_y % height(), pageHeight());
             
 #ifdef DEBUG_LAYOUT
             qDebug("Element is %lld %d, top_y %lld", track_y, size.height(),
@@ -222,7 +251,7 @@ void Page::findElements()
             return;
         }
         
-        QRect size = tmp->size(width(), track_y % height(), height());
+        QRect size = tmp->size(width(), track_y % height(), pageHeight());
         tmp->setPosition(track_y);
         tmp->setHeight(size.height());
         track_y += size.height();
@@ -232,7 +261,7 @@ void Page::findElements()
         qDebug("Read new element %lld %lld", tmp->position(), tmp->height());
 #endif
         
-        if(track_y > top_y + height())
+        if(track_y > top_y + pageHeight())
         {
 #ifdef DEBUG_LAYOUT
             qDebug("Bailing, %lld > %lld + %d", track_y, top_y, height());
@@ -290,4 +319,14 @@ void Page::dumpPushed()
     QByteArray bytes = bd.readAll();
     dump_file.write(bytes);
     dump_file.close();
+}
+
+int Page::pageStart()
+{
+    return menubar ? menubar->height() : 0;
+}
+
+int Page::pageHeight()
+{
+    return menubar ? height() - menubar->height() : height();
 }
