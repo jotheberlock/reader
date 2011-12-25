@@ -11,7 +11,6 @@
 
 class Mobi;
 class Parser;
-class PageButtonBar;
 
 class Page : public QWidget
 {
@@ -31,6 +30,8 @@ class Page : public QWidget
     }
     
     void setPage(int p);
+
+    void mouseFindElement(qint64 x, qint64 y);
     
   public slots:
 

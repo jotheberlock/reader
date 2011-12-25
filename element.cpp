@@ -24,6 +24,14 @@ QRect ParagraphElement::size(int w, int downpage, int pageheight)
         int space_width = qfm.averageCharWidth();
         linespacing = qfm.lineSpacing();
         
+        if (pos + qfm.lineSpacing() > pageheight)
+        {
+            qDebug("Size skipping at start pos %d linespacing %d page %d",
+                   pos, qfm.lineSpacing(), pageheight);
+            yy += (pageheight - pos);
+            pos = 0;
+        }
+
         for (int count=0; count<sf.text.size(); count++)
         {
             QString str = sf.text.at(count);
@@ -32,15 +40,21 @@ QRect ParagraphElement::size(int w, int downpage, int pageheight)
             if (xx + rect.width() > w)
             {
                 xx = 0;
-                yy += qfm.lineSpacing();
-                pos += qfm.lineSpacing();
 
-                    // Next line would overflow so we skip to
-                    // the next page
                 if (pos + qfm.lineSpacing() > pageheight)
                 {
+                    // Next line would overflow so we skip to
+                    // the next page
+                    qDebug("Size skipping word [%s] pos %d linespacing %d page %d",
+                           str.toAscii().data(), pos, qfm.lineSpacing(),
+                           pageheight);
                     yy += (pageheight - pos);
                     pos = 0;
+                }
+                else
+                {
+                    yy += qfm.lineSpacing();
+                    pos += qfm.lineSpacing();
                 }
             }
 
@@ -75,6 +89,12 @@ bool ParagraphElement::render(QPaintDevice * d, int x,int y, int w, int h)
         int space_width = qfm.averageCharWidth();
         linespacing = qfm.lineSpacing();
         
+        if (yy + qfm.lineSpacing() > h)
+        {
+            qDebug("Render skipping paragraph since would overlap");
+            return true;
+        }
+
         for (int count=0; count<sf.text.size(); count++)
         {
             QString str = sf.text.at(count);
@@ -83,16 +103,21 @@ bool ParagraphElement::render(QPaintDevice * d, int x,int y, int w, int h)
             if (xx + rect.width() > w)
             {
                 xx = x;
-                yy += qfm.lineSpacing();
 
                 if (yy + qfm.lineSpacing() > h)
                 {
+                    qDebug("Render skipping word [%s] pos %d linespacing %d page %d",
+                           str.toAscii().data(), yy, qfm.lineSpacing(), h);
                         // Next line would overflow, so we skip it
                     return true;
                 }
+                else
+                {
+                    yy += qfm.lineSpacing();
+                }
             }
 
-            p.drawText(xx, yy+qfm.ascent(), str);
+            p.drawText(xx, yy+qfm.ascent()+1, str);
             xx += rect.width();
             xx += space_width;
         }

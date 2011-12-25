@@ -14,6 +14,8 @@ class Element
     {
         current_position = 0;
         current_height = 0;
+        element_number = 0;
+        is_highlighted = false;
     }
 
     virtual ~Element()
@@ -30,12 +32,23 @@ class Element
     void setHeight(qint64 h) { current_height = h; }
     qint64 number() { return element_number; }
     void setNumber(qint64 n) { element_number = n; }
+
+    bool highlighted() 
+    {
+        return is_highlighted;
+    }
+
+    void setHighlighted(bool b)
+    {
+        is_highlighted = b;
+    }
     
   protected:
 
     qint64 current_position;
     qint64 current_height;
     qint64 element_number;
+    bool is_highlighted;
 
 };
 
@@ -66,7 +79,7 @@ class ParagraphElement : public Element
 
     ParagraphElement()
     {
-        font = QFont("Times New Roman", 24);
+        font = QFont("Times New Roman", 36);
     }
     
     virtual QRect size(int w, int downpage, int pageheight);

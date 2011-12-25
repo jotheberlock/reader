@@ -35,7 +35,7 @@ Page::Page(Mobi * m, Parser * p)
     QAction * dump_action = new QAction(QIcon(":/images/dump.png"), "Dump", this);
     buttonbar->addAction(back_action);
     buttonbar->addAction(dump_action);
-#if !defined(ANDROID)
+#if defined(SPOONJUGGLINGBABOONS)
     menubar = new QMenuBar(this);
     QMenu * menu = menubar->addMenu("&Menu");
     menu->addAction(back_action);
@@ -105,6 +105,32 @@ void Page::mousePressEvent(QMouseEvent * event)
     {
         buttonbar->hide();
     }
+    else
+    {
+        mouseFindElement(event->x(), event->y());
+    } 
+}
+
+void Page::mouseFindElement(qint64 x, qint64 y)
+{
+        // Convert y to logical units
+    y += (current_page * pageHeight());
+    
+    for (int loopc=0; loopc<elements.size(); loopc++)
+    {
+        Element * e = elements[loopc];
+        if (y >= e->position() && y < (e->position() + e->height()))
+        {
+            printf("Found element number %lld\n", e->number());
+            for (int loopc2=0; loopc2<elements.size(); loopc2++)
+            {
+                elements[loopc2]->setHighlighted(false);
+            }
+            
+            e->setHighlighted(true);
+            update();
+        }
+    }
 }
 
 void Page::layoutElements()
@@ -124,8 +150,14 @@ void Page::layoutElements()
                top_y + e->position(), e->height());
 
         QPainter p(this);
-        p.fillRect(0, top_y + e->position(), width(), e->height(),
-                   loopc % 2 ? QColor(255,200,200) : QColor(200,255,200));
+
+        QColor col = loopc % 2 ? QColor(255,200,200) : QColor(200,255,200);
+        if (e->highlighted())
+        {
+            col = QColor(255,0,0);
+        }
+        
+        p.fillRect(0, top_y + e->position(), width(), e->height(), col);
 #endif
             // Render happens in real coordinates
         e->render(this, 0, top_y + e->position(), width(), pageHeight());
