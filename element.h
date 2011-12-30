@@ -6,6 +6,8 @@
 #include <QtGui/QFont>
 #include <QtGui/QPixmap>
 
+class Page;
+
 class Element
 {
   public:
@@ -13,42 +15,34 @@ class Element
     Element()
     {
         current_position = 0;
-        current_height = 0;
         element_number = 0;
-        is_highlighted = false;
     }
 
     virtual ~Element()
     {
     }
+
+        // Called before anything else in layout
+    void configure(qint64 y, Page * p)
+    {
+        current_position = y;
+        page = p;
+    }
     
-    virtual bool render(QPaintDevice *, int x,int y, int w, int h) = 0;
-    virtual QRect size(int w, int downpage, int pageheight) = 0;
     virtual bool pageTerminator() = 0;
-
+    virtual qint64 height() = 0;
+        // offset maps screen to virtual coordinate
+    virtual void render(qint64 offset) = 0;
+    
     qint64 position()  { return current_position; }
-    void setPosition(qint64 p) { current_position = p; }
-    qint64 height() { return current_height; }
-    void setHeight(qint64 h) { current_height = h; }
-    qint64 number() { return element_number; }
     void setNumber(qint64 n) { element_number = n; }
-
-    bool highlighted() 
-    {
-        return is_highlighted;
-    }
-
-    void setHighlighted(bool b)
-    {
-        is_highlighted = b;
-    }
+    qint64 number() { return element_number; }
     
   protected:
 
     qint64 current_position;
-    qint64 current_height;
     qint64 element_number;
-    bool is_highlighted;
+    Page * page;
 
 };
 
@@ -73,17 +67,41 @@ class StringFragment
     
 };
 
+class Word
+{
+  public:
+
+    Word()
+    {
+        is_italic=false;
+        is_bold=false;
+        x=0;
+        y=0;
+        lx=0;
+        ly=0;
+        w=0;
+        h=0;
+    }
+
+    bool is_italic;
+    bool is_bold;
+    QString text;
+        // For drawing purposes
+    qint64 x,y;
+        // Bounding box
+    qint64 lx,ly, w, h;
+    
+};
+
+
 class ParagraphElement : public Element
 {
   public:
 
     ParagraphElement()
     {
-        font = QFont("Times New Roman", 36);
+        cached_height = -1;
     }
-    
-    virtual QRect size(int w, int downpage, int pageheight);
-    virtual bool render(QPaintDevice *, int x,int y, int w, int h);
 
     virtual bool pageTerminator() { return false; } 
     
@@ -97,10 +115,14 @@ class ParagraphElement : public Element
         return fragments.size();
     }
     
+    virtual qint64 height();
+    virtual void render(qint64 offset);
+    
   protected:
-
+    
     QList<StringFragment> fragments;
-    QFont font;
+    QList<Word> words;
+    qint64 cached_height;
     
 };
 
@@ -112,11 +134,11 @@ class PictureElement : public Element
     {
         pixmap = QPixmap::fromImage(i);
     }
-
-    virtual QRect size(int w, int downpage, int pageheight);
-    virtual bool render(QPaintDevice *, int x,int y, int w, int h);
     
     virtual bool pageTerminator() { return false; }
+    
+    virtual qint64 height();
+    virtual void render(qint64 offset);
     
   protected:
 
@@ -127,11 +149,11 @@ class PictureElement : public Element
 class PagebreakElement : public Element
 {
   public:
-    
-    virtual QRect size(int w, int downpage, int pageheight);
-    virtual bool render(QPaintDevice *, int,int,int,int)
-    { return true; }
+
     virtual bool pageTerminator() { return true; }
+    
+    virtual qint64 height();
+    virtual void render(qint64) {}
     
 };
 

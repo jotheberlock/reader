@@ -29,8 +29,15 @@ class Page : public QWidget
         elements.push_back(e);
     }
     
-    void setPage(int p);
-
+    void setPage(qint64 p);
+    qint64 getPage() { return current_page; }
+    qint64 getPageWidth() { return width(); }
+    qint64 getPageHeight() { return pageHeight(); }
+    qint64 getMargin() { return margin; }
+    qint64 getIndent() { return indent; }
+    qint64 getFontSize() { return fontsize; }
+    Element * getHighlighted() { return highlight; }
+    
     void mouseFindElement(qint64 x, qint64 y);
     
   public slots:
@@ -51,9 +58,13 @@ class Page : public QWidget
     int pageHeight();
 
     QList<Element *> elements;
-
+    Element * highlight;
+    
     qint64 current_page;
     qint64 next_y;
+    qint64 margin;
+    qint64 indent;
+    qint64 fontsize;
     
     Mobi * mobi;
     Parser * parser;

@@ -1,164 +1,98 @@
-#include "element.h"
 #include <stdio.h>
-
 #include <QtGui/QPainter>
 #include <QtGui/QFontMetrics>
 
-QRect ParagraphElement::size(int w, int downpage, int pageheight)
+#include "element.h"
+#include "page.h"
+
+qint64 ParagraphElement::height()
 {
-    int xx = 20;
-    int yy = 0;
-    int pos = downpage;
-    
-    int linespacing = 0;
-    
-    for (int fcount=0; fcount<fragments.size(); fcount++)
+    if (cached_height > -1)
     {
-        StringFragment sf = fragments.at(fcount);
-        font.setItalic(sf.is_italic);
-        font.setBold(sf.is_bold);
-        
-        QFontMetrics qfm(font);
-        qfm = QFontMetrics(font);
-        
-        int space_width = qfm.averageCharWidth();
-        linespacing = qfm.lineSpacing();
-        
-        if (pos + qfm.lineSpacing() > pageheight)
-        {
-            qDebug("Size skipping at start pos %d linespacing %d page %d",
-                   pos, qfm.lineSpacing(), pageheight);
-            yy += (pageheight - pos);
-            pos = 0;
-        }
+        return cached_height;
+    }
 
-        for (int count=0; count<sf.text.size(); count++)
-        {
-            QString str = sf.text.at(count);
-            QRect rect = qfm.boundingRect(str);
+    words.clear();
+    cached_height = 0;
+    
+    qint64 xpos = page->getIndent() + page->getMargin();
+    qint64 ypos = current_position;
 
-            if (xx + rect.width() > w)
+    for (int loopc=0; loopc<fragments.size(); loopc++)
+    {
+        StringFragment & sf = fragments[loopc];
+        QFont metrics;
+        metrics.setPointSize(page->getFontSize());
+        metrics.setItalic(sf.is_italic);
+        metrics.setBold(sf.is_bold);
+        QFontMetrics qfm(metrics);
+        for (int loopc2=0; loopc2<sf.text.size(); loopc2++)
+        {
+            Word word;
+            word.text = sf.text[loopc2];
+            word.lx = xpos;
+            word.ly = ypos;
+            word.w = qfm.width(word.text);
+            word.h = qfm.height();
+
+            qint64 adv = word.w + qfm.width(" ");
+
+                /*
+            printf("%lld %lld %lld %lld [%s]\n", xpos, ypos, adv,
+                   (page->getPageWidth() - page->getMargin()),
+                   word.text.toAscii().data());
+                */
+            
+            if ( (xpos + adv) > (page->getPageWidth() - page->getMargin()))
             {
-                xx = 0;
-
-                if (pos + qfm.lineSpacing() > pageheight)
-                {
-                    // Next line would overflow so we skip to
-                    // the next page
-                    qDebug("Size skipping word [%s] pos %d linespacing %d page %d",
-                           str.toAscii().data(), pos, qfm.lineSpacing(),
-                           pageheight);
-                    yy += (pageheight - pos);
-                    pos = 0;
-                }
-                else
-                {
-                    yy += qfm.lineSpacing();
-                    pos += qfm.lineSpacing();
-                }
+                xpos = page->getMargin();
+                ypos += qfm.lineSpacing();
+                cached_height += qfm.lineSpacing();
             }
-
-            xx += rect.width();
-            xx += space_width;
+            
+            word.x = xpos;
+            word.y = ypos+qfm.ascent();
+            xpos += adv;
+            words.push_back(word);
         }
     }
 
-    return QRect(0,0,w,yy+linespacing);
+    return cached_height;
 }
 
-bool ParagraphElement::render(QPaintDevice * d, int x,int y, int w, int h)
+void ParagraphElement::render(qint64 offset)
 {
-    int xx = x + 20;
-    int yy = y;
+    QFont f;
+    f.setPointSize(page->getFontSize());
+    QPainter p(page);
     
-    QPainter p;
-    p.begin(d);
-
-    int linespacing = 0;
-    
-    for (int fcount=0; fcount<fragments.size(); fcount++)
+    for (int loopc=0; loopc<words.size(); loopc++)
     {
-        StringFragment sf = fragments.at(fcount);
-        font.setItalic(sf.is_italic);
-        font.setBold(sf.is_bold);
-
-        QFontMetrics qfm(font);
-        qfm = QFontMetrics(font);
-        p.setFont(font);
-        
-        int space_width = qfm.averageCharWidth();
-        linespacing = qfm.lineSpacing();
-        
-        if (yy + qfm.lineSpacing() > h)
-        {
-            qDebug("Render skipping paragraph since would overlap");
-            return true;
-        }
-
-        for (int count=0; count<sf.text.size(); count++)
-        {
-            QString str = sf.text.at(count);
-            QRect rect = qfm.boundingRect(str);
-
-            if (xx + rect.width() > w)
-            {
-                xx = x;
-
-                if (yy + qfm.lineSpacing() > h)
-                {
-                    qDebug("Render skipping word [%s] pos %d linespacing %d page %d",
-                           str.toAscii().data(), yy, qfm.lineSpacing(), h);
-                        // Next line would overflow, so we skip it
-                    return true;
-                }
-                else
-                {
-                    yy += qfm.lineSpacing();
-                }
-            }
-
-            p.drawText(xx, yy+qfm.ascent()+1, str);
-            xx += rect.width();
-            xx += space_width;
-        }
-    }
-    
-    p.end();
-    return false;
+        Word & word = words[loopc];
+        f.setItalic(word.is_italic);
+        f.setBold(word.is_bold);
+        p.setFont(f);
+        p.drawText(word.x, word.y+offset, word.text);
+    }    
 }
 
-QRect PictureElement::size(int w, int downpage, int pageheight)
+qint64 PictureElement::height()
 {
-    double scale = ((double)w) / ((double)pixmap.width());
-
-    qDebug(">> Scale %f %f %f", scale, ((double)w), ((double)pixmap.width()));
-    
-    return QRect(0,0,(int)(scale * pixmap.width()),
-                (int)(scale * pixmap.height()));
+        // Acts as pagebreak then whole page
+    qint64 ph = page->getPageHeight();    
+    return ph + ( ph - (current_position % ph) );
 }
 
-bool PictureElement::render(QPaintDevice * d, int x,int y, int w, int h)
+void PictureElement::render(qint64 offset)
 {
-    if (pixmap.width() < 1 || pixmap.height() < 1)
-    {
-        return false;
-    }
-    
-    double scale = ((double)w-x) / ((double)pixmap.width());
-    int length = (int)(((double)pixmap.height()) * scale);
-    
-    QPainter p;
-    p.begin(d);
-    p.drawPixmap(x,y,(w-x),length, pixmap);
-    p.end();
-
-    return true;
+    QPainter painter(page);
+    QRect target(0, current_position+offset, page->getPageWidth(), page->getPageHeight());
+    QRect source(0,0,pixmap.width(), pixmap.height());
+    painter.drawPixmap(target, pixmap, source);
 }
 
-QRect PagebreakElement::size(int w, int downpage, int pageheight)
+qint64 PagebreakElement::height()
 {
-    QRect r;
-    r.setWidth(w);
-    r.setHeight(pageheight-downpage);
-    return r;
+    qint64 ph = page->getPageHeight();    
+    return ph - (current_position % ph);
 }

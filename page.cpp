@@ -48,6 +48,10 @@ Page::Page(Mobi * m, Parser * p)
     connect(dump_action, SIGNAL(triggered()), this, SLOT(dumpPushed()));
     buttonbar->setAutoFillBackground(true);
     buttonbar->hide();
+    fontsize = 36;
+    indent = 20;
+    margin = 0;
+    highlight = 0;
 }
 
 void Page::paintEvent(QPaintEvent *)
@@ -115,19 +119,15 @@ void Page::mouseFindElement(qint64 x, qint64 y)
 {
         // Convert y to logical units
     y += (current_page * pageHeight());
+
+    highlight = 0;
     
     for (int loopc=0; loopc<elements.size(); loopc++)
     {
         Element * e = elements[loopc];
         if (y >= e->position() && y < (e->position() + e->height()))
         {
-            printf("Found element number %lld\n", e->number());
-            for (int loopc2=0; loopc2<elements.size(); loopc2++)
-            {
-                elements[loopc2]->setHighlighted(false);
-            }
-            
-            e->setHighlighted(true);
+            highlight = e;
             update();
         }
     }
@@ -152,7 +152,7 @@ void Page::layoutElements()
         QPainter p(this);
 
         QColor col = loopc % 2 ? QColor(255,200,200) : QColor(200,255,200);
-        if (e->highlighted())
+        if (e == highlight)
         {
             col = QColor(255,0,0);
         }
@@ -160,12 +160,13 @@ void Page::layoutElements()
         p.fillRect(0, top_y + e->position(), width(), e->height(), col);
 #endif
             // Render happens in real coordinates
-        e->render(this, 0, top_y + e->position(), width(), pageHeight());
+        e->render(top_y);
     }
 }
 
 void Page::clearElements()
 {
+    highlight = 0;
     for (int loopc=0; loopc<elements.size(); loopc++)
     {
         delete elements[loopc];
@@ -220,7 +221,7 @@ void Page::findElements()
         }
     }
     while (keep_going);
-    
+
         // Verify that first element stored is before the page
     if (elements.size() == 0 || elements[0]->position() > top_y)
     {
@@ -243,28 +244,28 @@ void Page::findElements()
                 return;
             }
 
-            QRect size = tmp->size(width(), track_y % height(), pageHeight());
+            tmp->configure(track_y, this);
+            
+            qint64 e_height = tmp->height();
             
 #ifdef DEBUG_LAYOUT
-            qDebug("Element is %lld %d, top_y %lld", track_y, size.height(),
+            qDebug("Element is %lld %lld, top_y %lld", track_y, e_height,
                    top_y);
 #endif
             
-            if(track_y+size.height() > top_y)
+            if(track_y+e_height > top_y)
             {
 #ifdef DEBUG_LAYOUT
-                qDebug("Found first element %lld %d", track_y, size.height());
+                qDebug("Found first element %lld %lld", track_y, e_height);
 #endif
                     // Reached first visible element, time to bail
-                tmp->setPosition(track_y);
-                tmp->setHeight(size.height());
-                next_y = track_y + size.height();
+                next_y = track_y + e_height;
                 elements.push_back(tmp);
                 break;
             }
             else
             {
-                track_y += size.height();
+                track_y += e_height;
                 delete tmp;
             }
         }
@@ -282,11 +283,10 @@ void Page::findElements()
             next_y = track_y;
             return;
         }
-        
-        QRect size = tmp->size(width(), track_y % height(), pageHeight());
-        tmp->setPosition(track_y);
-        tmp->setHeight(size.height());
-        track_y += size.height();
+
+        tmp->configure(track_y, this);
+        qint64 e_height = tmp->height();
+        track_y += e_height;
 
         elements.push_back(tmp);
 #ifdef DEBUG_LAYOUT
@@ -318,7 +318,7 @@ void Page::previousPage()
     }
 }
 
-void Page::setPage(int p)
+void Page::setPage(qint64 p)
 {   
     current_page = p;
     findElements();
