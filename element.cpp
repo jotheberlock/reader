@@ -18,6 +18,13 @@ qint64 ParagraphElement::height()
     qint64 xpos = page->getIndent() + page->getMargin();
     qint64 ypos = current_position;
 
+    qint64 page_end = ypos;
+    page_end = page_end / page->getPageHeight();
+    page_end = page_end * page->getPageHeight();
+    page_end += page->getPageHeight();
+
+    qint64 line_length = 0;
+    
     for (int loopc=0; loopc<fragments.size(); loopc++)
     {
         StringFragment & sf = fragments[loopc];
@@ -42,12 +49,24 @@ qint64 ParagraphElement::height()
                    (page->getPageWidth() - page->getMargin()),
                    word.text.toAscii().data());
                 */
+
+            line_length = qfm.lineSpacing();
             
             if ( (xpos + adv) > (page->getPageWidth() - page->getMargin()))
             {
                 xpos = page->getMargin();
-                ypos += qfm.lineSpacing();
-                cached_height += qfm.lineSpacing();
+                ypos += line_length;
+                cached_height += line_length;
+            }
+
+            if ( (ypos + line_length) > page_end)
+            {
+                    // Text drawn here would clip
+                printf("Text clipping at bottom %lld %lld %lld adding %lld\n",
+                       ypos, ypos + line_length, page_end, (page_end - ypos));
+                cached_height += (page_end - ypos);
+                ypos = page_end;
+                page_end += page->getPageHeight();
             }
             
             word.x = xpos;
@@ -57,6 +76,7 @@ qint64 ParagraphElement::height()
         }
     }
 
+    cached_height += line_length;
     return cached_height;
 }
 
@@ -74,6 +94,22 @@ void ParagraphElement::render(qint64 offset)
         p.setFont(f);
         p.drawText(word.x, word.y+offset, word.text);
     }    
+}
+
+QString ParagraphElement::hitTest(qint64 x, qint64 y)
+{
+    height();  // Ensure word list is built - it should be but no harm in being safe
+    for (int loopc=0; loopc<words.size(); loopc++)
+    {
+        Word & word = words[loopc];
+        if (x>=word.lx && y>=word.ly &&
+            x<=(word.lx+word.w) && y<=(word.ly+word.h))
+        {
+            return word.text;
+        }
+    }
+
+    return "";
 }
 
 qint64 PictureElement::height()

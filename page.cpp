@@ -50,8 +50,7 @@ Page::Page(Mobi * m, Parser * p)
     buttonbar->hide();
     fontsize = 36;
     indent = 20;
-    margin = 0;
-    highlight = 0;
+    margin = 50;
 }
 
 void Page::paintEvent(QPaintEvent *)
@@ -119,17 +118,17 @@ void Page::mouseFindElement(qint64 x, qint64 y)
 {
         // Convert y to logical units
     y += (current_page * pageHeight());
-
-    highlight = 0;
-    
     for (int loopc=0; loopc<elements.size(); loopc++)
     {
         Element * e = elements[loopc];
-        if (y >= e->position() && y < (e->position() + e->height()))
+        if (y >= e->position() && y <= (e->position() + e->height()))
         {
-            highlight = e;
-            update();
-        }
+            QString ret = e->hitTest(x,y);
+            if (ret != "")
+            {
+                printf("!! [%s]\n", ret.toAscii().data());
+            }
+        } 
     }
 }
 
@@ -152,11 +151,6 @@ void Page::layoutElements()
         QPainter p(this);
 
         QColor col = loopc % 2 ? QColor(255,200,200) : QColor(200,255,200);
-        if (e == highlight)
-        {
-            col = QColor(255,0,0);
-        }
-        
         p.fillRect(0, top_y + e->position(), width(), e->height(), col);
 #endif
             // Render happens in real coordinates
@@ -166,7 +160,6 @@ void Page::layoutElements()
 
 void Page::clearElements()
 {
-    highlight = 0;
     for (int loopc=0; loopc<elements.size(); loopc++)
     {
         delete elements[loopc];

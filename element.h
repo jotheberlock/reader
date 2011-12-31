@@ -28,6 +28,10 @@ class Element
         current_position = y;
         page = p;
     }
+
+        // Should probably come up with some more general interface here
+    virtual QString hitTest(qint64 /*x*/, qint64 /*y*/)
+    { return ""; }
     
     virtual bool pageTerminator() = 0;
     virtual qint64 height() = 0;
@@ -117,6 +121,7 @@ class ParagraphElement : public Element
     
     virtual qint64 height();
     virtual void render(qint64 offset);
+    virtual QString hitTest(qint64 x, qint64 y);
     
   protected:
     

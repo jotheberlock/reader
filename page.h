@@ -36,7 +36,6 @@ class Page : public QWidget
     qint64 getMargin() { return margin; }
     qint64 getIndent() { return indent; }
     qint64 getFontSize() { return fontsize; }
-    Element * getHighlighted() { return highlight; }
     
     void mouseFindElement(qint64 x, qint64 y);
     
@@ -58,7 +57,6 @@ class Page : public QWidget
     int pageHeight();
 
     QList<Element *> elements;
-    Element * highlight;
     
     qint64 current_page;
     qint64 next_y;
