@@ -38,6 +38,7 @@ class Page : public QWidget
     qint64 getFontSize() { return fontsize; }
     
     void mouseFindElement(qint64 x, qint64 y);
+    void displayMessage(QString caption, QString message);
     
   public slots:
 

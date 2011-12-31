@@ -2,14 +2,16 @@
 
 #include <QtCore/QFile>
 #include <QtGui/QPainter>
+#include <QtGui/QMessageBox>
 
 #include "page.h"
 #include "mobi.h"
 #include "parser.h"
 #include "shelfscreen.h"
 #include "bookdevice.h"
+#include "wordplugin.h"
 
-#define DEBUG_LAYOUT
+//#define DEBUG_LAYOUT
 
 Page::Page(Mobi * m, Parser * p)
 {
@@ -58,6 +60,11 @@ void Page::paintEvent(QPaintEvent *)
     layoutElements();
 }
 
+void Page::displayMessage(QString caption, QString message)
+{
+    QMessageBox::about(this, caption, message);
+}
+    
 void Page::resizeEvent(QResizeEvent *)
 {
     if (buttonbar->isVisible())
@@ -126,7 +133,8 @@ void Page::mouseFindElement(qint64 x, qint64 y)
             QString ret = e->hitTest(x,y);
             if (ret != "")
             {
-                printf("!! [%s]\n", ret.toAscii().data());
+                WhitakerPlugin wp;
+                wp.handleWord(ret, this);
             }
         } 
     }
