@@ -405,8 +405,9 @@ void Parser::dumpTag(Tag * tag)
         
         in_paragraph = false;
     }
-    else if(false /*tag->name == "mbp:pagebreak"*/)
+    else if(tag->name == "mbp:pagebreak")
     {
+        printf("Making pagebreak element\n");
         PagebreakElement * pe = new PagebreakElement;
         element = pe;
         element->setNumber(next_element++);

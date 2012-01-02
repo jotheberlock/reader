@@ -33,7 +33,6 @@ class Element
     virtual QString hitTest(qint64 /*x*/, qint64 /*y*/)
     { return ""; }
     
-    virtual bool pageTerminator() = 0;
     virtual qint64 height() = 0;
         // offset maps screen to virtual coordinate
     virtual void render(qint64 offset) = 0;
@@ -106,8 +105,6 @@ class ParagraphElement : public Element
     {
         cached_height = -1;
     }
-
-    virtual bool pageTerminator() { return false; } 
     
     void addFragment(StringFragment s)
     {
@@ -139,9 +136,7 @@ class PictureElement : public Element
     {
         pixmap = QPixmap::fromImage(i);
     }
-    
-    virtual bool pageTerminator() { return false; }
-    
+        
     virtual qint64 height();
     virtual void render(qint64 offset);
     
@@ -154,8 +149,6 @@ class PictureElement : public Element
 class PagebreakElement : public Element
 {
   public:
-
-    virtual bool pageTerminator() { return true; }
     
     virtual qint64 height();
     virtual void render(qint64) {}

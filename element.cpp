@@ -129,6 +129,16 @@ void PictureElement::render(qint64 offset)
 
 qint64 PagebreakElement::height()
 {
-    qint64 ph = page->getPageHeight();    
-    return ph - (current_position % ph);
+    qint64 ph = page->getPageHeight();
+    if ( (current_position % ph) == 0)
+    {
+        printf("Null pagebreak\n");
+        return 0;
+    }
+    else
+    {
+        printf("Pagebreak %lld %lld %lld\n",
+               ph, current_position, ph - (current_position %  ph));
+        return ph - (current_position % ph);
+    } 
 }
