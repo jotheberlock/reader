@@ -1,0 +1,6 @@
+<!DOCTYPE RCC><RCC version="1.0">
+ <qresource>
+     <file>images/back.png</file>
+     <file>images/dump.png</file>
+ </qresource>
+ </RCC>
