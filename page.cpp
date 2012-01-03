@@ -35,22 +35,33 @@ Page::Page(Mobi * m, Parser * p)
     buttonbar = new QToolBar(this);
     QAction * back_action = new QAction(QIcon(":/images/back.png"), "Back", this);
     QAction * dump_action = new QAction(QIcon(":/images/dump.png"), "Dump", this);
+    QAction * bigger_action = new QAction(QIcon(":/images/bigger.png"), "Bigger", this);
+    QAction * smaller_action = new QAction(QIcon(":/images/smaller.png"), "Smaller", this);
     buttonbar->addAction(back_action);
     buttonbar->addAction(dump_action);
+    buttonbar->addAction(bigger_action);
+    buttonbar->addAction(smaller_action);
 #if defined(SPOONJUGGLINGBABOONS)
     menubar = new QMenuBar(this);
     QMenu * menu = menubar->addMenu("&Menu");
     menu->addAction(back_action);
     menu->addAction(dump_action);
+    menu->addAction(bigger_action);
+    menu->addAction(smaller_action);
     menubar->setAutoFillBackground(true);
 #else
     menubar = 0;
 #endif
     connect(back_action, SIGNAL(triggered()), this, SLOT(backPushed()));
     connect(dump_action, SIGNAL(triggered()), this, SLOT(dumpPushed()));
+    connect(bigger_action, SIGNAL(triggered()), this, SLOT(biggerPushed()));
+    connect(smaller_action, SIGNAL(triggered()), this, SLOT(smallerPushed()));
     buttonbar->setAutoFillBackground(true);
     buttonbar->hide();
-    fontsize = 36;
+    
+    int f = settings->value("fontsize").toInt();
+    fontsize = (f > 0) ? f : 36;
+    
     indent = 20;
     margin = 50;
 }
@@ -214,10 +225,12 @@ void Page::findElements()
                 qDebug("Purging after element at %lld %lld",
                        e->position(), e->height());
 #endif
+                    /*
                 delete e;
                 elements.removeAt(loopc);
                 keep_going = true;
                 break;
+                    */
             }
         }
     }
@@ -297,7 +310,7 @@ void Page::findElements()
         if(track_y > top_y + pageHeight())
         {
 #ifdef DEBUG_LAYOUT
-            qDebug("Bailing, %lld > %lld + %d", track_y, top_y, height());
+            qDebug("Bailing, %lld > %lld + %d, with element %lld", track_y, top_y, height(), tmp->number());
 #endif
                 // Reached last visible element, time to bail
             next_y = track_y;
@@ -352,6 +365,26 @@ void Page::dumpPushed()
     QByteArray bytes = bd.readAll();
     dump_file.write(bytes);
     dump_file.close();
+}
+
+void Page::biggerPushed()
+{
+    fontsize += 2;
+    settings->setValue("fontsize", fontsize);
+    clearElements();
+    findElements();
+}
+
+void Page::smallerPushed()
+{
+    if (fontsize > 2)
+    {
+        fontsize -= 2;
+    }
+    settings->setValue("fontsize", fontsize);
+    clearElements();
+    findElements();
+    update();
 }
 
 int Page::pageStart()

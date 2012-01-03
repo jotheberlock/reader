@@ -62,8 +62,7 @@ qint64 ParagraphElement::height()
             if ( (ypos + line_length) > page_end)
             {
                     // Text drawn here would clip
-                printf("Text clipping at bottom %lld %lld %lld adding %lld\n",
-                       ypos, ypos + line_length, page_end, (page_end - ypos));
+                qDebug("Paragraph %lld skipping to next page", element_number);
                 cached_height += (page_end - ypos);
                 ypos = page_end;
                 page_end += page->getPageHeight();
@@ -132,12 +131,12 @@ qint64 PagebreakElement::height()
     qint64 ph = page->getPageHeight();
     if ( (current_position % ph) == 0)
     {
-        printf("Null pagebreak\n");
+        qDebug("Null pagebreak");
         return 0;
     }
     else
     {
-        printf("Pagebreak %lld %lld %lld\n",
+        qDebug("Pagebreak %lld %lld %lld",
                ph, current_position, ph - (current_position %  ph));
         return ph - (current_position % ph);
     } 

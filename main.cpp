@@ -46,6 +46,7 @@ int main(int argc, char ** argv)
     int cpage = settings->value("currentpage").toInt();
     int w = settings->value("width").toInt();
     int h = settings->value("height").toInt();
+    
     if (shelfscreen->readBook(cbook))
     {
         shelfscreen->currentPage()->setPage(cpage);

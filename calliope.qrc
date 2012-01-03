@@ -2,5 +2,7 @@
  <qresource>
      <file>images/back.png</file>
      <file>images/dump.png</file>
+     <file>images/bigger.png</file>
+     <file>images/smaller.png</file>
  </qresource>
  </RCC>

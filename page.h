@@ -30,6 +30,8 @@ class Page : public QWidget
     }
     
     void setPage(qint64 p);
+    void setFontSize(int p) { fontsize=p; }
+        
     qint64 getPage() { return current_page; }
     qint64 getPageWidth() { return width(); }
     qint64 getPageHeight() { return pageHeight(); }
@@ -44,6 +46,8 @@ class Page : public QWidget
 
     void backPushed();
     void dumpPushed();
+    void biggerPushed();
+    void smallerPushed();
     
   protected:
 
