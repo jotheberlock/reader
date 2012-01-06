@@ -151,13 +151,10 @@ void Page::mouseFindElement(qint64 x, qint64 y)
         
         if (y >= e->position() && y <= (e->position() + e->height()))
         {
-            for (int loopc=0; loopc<filters.size(); loopc++)
+            Filter * f = filter_manager->getActiveTouchFilter();
+            if (f)
             {
-                Filter * f = filters[loopc];
-                if (f->getActive())
-                {
-                    f->onRelease(e, this, x, y);
-                }
+                f->onRelease(e, this, x, y);
             }
         } 
     }

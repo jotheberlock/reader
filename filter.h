@@ -26,7 +26,8 @@ class Filter
     {
         active=a;
     }
-    
+
+    virtual bool handlesTouch() = 0;
     virtual QString name() = 0;
         // Called before StringFragments are laid out
     virtual void beforeLayout(ParagraphElement *) = 0;
@@ -43,6 +44,25 @@ class Filter
     
 };
 
-extern QList<Filter *> filters;
+class FilterManager
+{
+  public:
+
+    FilterManager();
+    void addFilter(Filter * filter);
+    Filter * getFilter(QString name);
+    QList<Filter *> getFilters();
+    QList<Filter *> getTouchFilters();
+    void setActiveTouchFilter(Filter * f) { touch_filter=f; }
+    Filter * getActiveTouchFilter() { return touch_filter; }
+    
+  protected:
+
+    QList<Filter *> filters;
+    Filter * touch_filter;
+    
+};
+
+extern FilterManager * filter_manager;
 
 #endif

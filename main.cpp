@@ -18,7 +18,7 @@ Bookshelf * bookshelf;
 QStackedWidget * top_level;
 QSettings * settings;
 
-QList<Filter *> filters;
+FilterManager * filter_manager;
 
 int main(int argc, char ** argv)
 {
@@ -27,7 +27,8 @@ int main(int argc, char ** argv)
     font.setBold(true);
     app.setFont(font);
 
-    filters.push_back(new DictionaryFilter(new WhitakerDictionary()));
+    filter_manager = new FilterManager();
+    filter_manager->addFilter(new DictionaryFilter(new WhitakerDictionary()));
     
     settings = new QSettings("Joel Dillon", "Calliope eReader");
     bookshelf = new Bookshelf;
@@ -53,12 +54,19 @@ int main(int argc, char ** argv)
     int cpage = settings->value("currentpage").toInt();
     int w = settings->value("width").toInt();
     int h = settings->value("height").toInt();
+
+    if (settings->contains("active_touch"))
+    {
+        Filter * f = filter_manager->getFilter(settings->value("active_touch").toString());
+        filter_manager->setActiveTouchFilter(f);
+    }
     
     if (shelfscreen->readBook(cbook))
     {
         shelfscreen->currentPage()->setPage(cpage);
     }
 
+                              
     if (w > 0 && h > 0)
     {
         top_level->resize(w,h);

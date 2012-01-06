@@ -10,6 +10,7 @@ FilterPicker::FilterPicker(QWidget * parent)
     : QWidget(parent)
 {
     layout = new QBoxLayout(QBoxLayout::TopToBottom, this);
+    QList<Filter *> filters = filter_manager->getFilters();
     for (int loopc=0; loopc<filters.size(); loopc++)
     {
         Filter * filter = filters[loopc];
