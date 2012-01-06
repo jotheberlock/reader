@@ -1,7 +1,7 @@
 #ifndef _PAGE_
 #define _PAGE_
 
-#include <QtGui/QWidget>
+#include <QtGui/QFrame>
 #include <QtGui/QMouseEvent>
 #include <QtGui/QToolBar>
 #include <QtGui/QMenuBar>
@@ -12,7 +12,7 @@
 class Mobi;
 class Parser;
 
-class Page : public QWidget
+class Page : public QFrame
 {
     Q_OBJECT
         

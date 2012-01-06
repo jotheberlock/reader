@@ -113,15 +113,21 @@ QString ParagraphElement::hitTest(qint64 x, qint64 y)
 
 qint64 PictureElement::height()
 {
-        // Acts as pagebreak then whole page
-    qint64 ph = page->getPageHeight();    
-    return ph + ( ph - (current_position % ph) );
+    double sw = pixmap.width();
+    double dw = page->getPageWidth();
+    double multi = dw/sw;
+    
+    return (pixmap.height() * multi);
 }
 
 void PictureElement::render(qint64 offset)
 {
+    double sw = pixmap.width();
+    double dw = page->getPageWidth();
+    double multi = dw/sw;
+    
     QPainter painter(page);
-    QRect target(0, current_position+offset, page->getPageWidth(), page->getPageHeight());
+    QRect target(0, current_position+offset, page->getPageWidth(), pixmap.height() * multi);
     QRect source(0,0,pixmap.width(), pixmap.height());
     painter.drawPixmap(target, pixmap, source);
 }
