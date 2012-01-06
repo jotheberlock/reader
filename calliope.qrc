@@ -4,5 +4,6 @@
      <file>images/dump.png</file>
      <file>images/bigger.png</file>
      <file>images/smaller.png</file>
+     <file>images/filters.png</file>
  </qresource>
  </RCC>

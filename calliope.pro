@@ -1,6 +1,6 @@
-HEADERS = mobi.h page.h element.h bookdevice.h parser.h bookshelf.h shelfscreen.h wordplugin.h
+HEADERS = mobi.h page.h element.h bookdevice.h parser.h bookshelf.h shelfscreen.h filters.h dictionary.h filterpicker.h dictionaryfilter.h whitaker.h
 
-SOURCES = mobi.cpp page.cpp element.cpp main.cpp bookdevice.cpp parser.cpp bookshelf.cpp shelfscreen.cpp wordplugin.cpp
+SOURCES = mobi.cpp page.cpp element.cpp main.cpp bookdevice.cpp parser.cpp bookshelf.cpp shelfscreen.cpp wordplugin.cpp filterpicker.cpp dictionaryfilter.cpp whitaker.cpp
 
 CONFIG += debug
 

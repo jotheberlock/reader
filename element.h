@@ -119,6 +119,11 @@ class ParagraphElement : public Element
     virtual qint64 height();
     virtual void render(qint64 offset);
     virtual QString hitTest(qint64 x, qint64 y);
+
+    QList<Word> & getWords()
+    {
+        return words;
+    }
     
   protected:
     

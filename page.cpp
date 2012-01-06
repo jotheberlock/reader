@@ -10,6 +10,7 @@
 #include "shelfscreen.h"
 #include "bookdevice.h"
 #include "wordplugin.h"
+#include "filterpicker.h"
 
 //#define DEBUG_LAYOUT
 
@@ -37,10 +38,12 @@ Page::Page(Mobi * m, Parser * p)
     QAction * dump_action = new QAction(QIcon(":/images/dump.png"), "Dump", this);
     QAction * bigger_action = new QAction(QIcon(":/images/bigger.png"), "Bigger", this);
     QAction * smaller_action = new QAction(QIcon(":/images/smaller.png"), "Smaller", this);
+    QAction * filters_action = new QAction(QIcon(":/images/filters.png"), "Filters", this);
     buttonbar->addAction(back_action);
     buttonbar->addAction(dump_action);
     buttonbar->addAction(bigger_action);
     buttonbar->addAction(smaller_action);
+    buttonbar->addAction(filters_action);
 #if defined(SPOONJUGGLINGBABOONS)
     menubar = new QMenuBar(this);
     QMenu * menu = menubar->addMenu("&Menu");
@@ -48,6 +51,7 @@ Page::Page(Mobi * m, Parser * p)
     menu->addAction(dump_action);
     menu->addAction(bigger_action);
     menu->addAction(smaller_action);
+    menu->addAction(filters_action);
     menubar->setAutoFillBackground(true);
 #else
     menubar = 0;
@@ -56,6 +60,7 @@ Page::Page(Mobi * m, Parser * p)
     connect(dump_action, SIGNAL(triggered()), this, SLOT(dumpPushed()));
     connect(bigger_action, SIGNAL(triggered()), this, SLOT(biggerPushed()));
     connect(smaller_action, SIGNAL(triggered()), this, SLOT(smallerPushed()));
+    connect(filters_action, SIGNAL(triggered()), this, SLOT(filtersPushed()));
     buttonbar->setAutoFillBackground(true);
     buttonbar->hide();
     
@@ -97,7 +102,7 @@ void Page::resizeEvent(QResizeEvent *)
     update();
 }
 
-void Page::mousePressEvent(QMouseEvent * event)
+void Page::mouseReleaseEvent(QMouseEvent * event)
 {
     int sensitive_zone_x = width() / 10;
     int sensitive_zone_y = height() / 10;
@@ -138,14 +143,21 @@ void Page::mouseFindElement(qint64 x, qint64 y)
     y += (current_page * pageHeight());
     for (int loopc=0; loopc<elements.size(); loopc++)
     {
-        Element * e = elements[loopc];
+        ParagraphElement * e = dynamic_cast<ParagraphElement *>(elements[loopc]);
+        if (!e)
+        {
+            continue;
+        }
+        
         if (y >= e->position() && y <= (e->position() + e->height()))
         {
-            QString ret = e->hitTest(x,y);
-            if (ret != "")
+            for (int loopc=0; loopc<filters.size(); loopc++)
             {
-                WhitakerPlugin wp;
-                wp.handleWord(ret, this);
+                Filter * f = filters[loopc];
+                if (f->getActive())
+                {
+                    f->onRelease(e, this, x, y);
+                }
             }
         } 
     }
@@ -385,6 +397,14 @@ void Page::smallerPushed()
     clearElements();
     findElements();
     update();
+}
+
+void Page::filtersPushed()
+{
+    FilterPicker * fp = new FilterPicker(this);
+    fp->setGeometry(0,0,width(),height());
+    fp->raise();
+    fp->show();
 }
 
 int Page::pageStart()

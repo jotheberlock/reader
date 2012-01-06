@@ -20,7 +20,7 @@ class Page : public QWidget
 
     Page(Mobi *, Parser *);
 
-    virtual void mousePressEvent(QMouseEvent *);
+    virtual void mouseReleaseEvent(QMouseEvent *);
     virtual void paintEvent(QPaintEvent *);
     virtual void resizeEvent(QResizeEvent *);
 
@@ -48,6 +48,7 @@ class Page : public QWidget
     void dumpPushed();
     void biggerPushed();
     void smallerPushed();
+    void filtersPushed();
     
   protected:
 

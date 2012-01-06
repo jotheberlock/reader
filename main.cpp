@@ -10,10 +10,15 @@
 #include "bookdevice.h"
 #include "bookshelf.h"
 #include "shelfscreen.h"
+#include "filter.h"
+#include "dictionaryfilter.h"
+#include "whitaker.h"
 
 Bookshelf * bookshelf;
 QStackedWidget * top_level;
 QSettings * settings;
+
+QList<Filter *> filters;
 
 int main(int argc, char ** argv)
 {
@@ -21,6 +26,8 @@ int main(int argc, char ** argv)
     QFont font("Droid Sans");
     font.setBold(true);
     app.setFont(font);
+
+    filters.push_back(new DictionaryFilter(new WhitakerDictionary()));
     
     settings = new QSettings("Joel Dillon", "Calliope eReader");
     bookshelf = new Bookshelf;
