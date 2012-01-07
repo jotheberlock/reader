@@ -1,65 +1,86 @@
 #include <QtCore/QFile>
 #include <QtCore/QDir>
+#include <QtCore/QTextStream>
 
 #include "whitaker.h"
 
-QString WhitakerDictionary::lookup(QString word)
-{
-    if (!loaded)
-    {
-        doLoad();
-    }
+ QDataStream & operator>> ( QDataStream & out, WhitLocation val )
+ {
+     out >> val.pos;
+     out >> val.len;
+     return out;
+ }
 
-    if (words.contains(word))
-    {
-        QString docs_path;
-        docs_path = QDir::homePath() + QDir::separator() + "Documents";
-        WhitLocation wl = words[word];
-        QFile definitions(docs_path+"/definitions.cal");
-        if (!definitions.open(QIODevice::ReadOnly))
-        {
-            qDebug("Can't open definitions.cal");
-            return "";
-        }
+ QString WhitakerDictionary::lookup(QString word)
+ {
+     if (!loaded)
+     {
+         doLoad();
+     }
 
-        qDebug("Matching [%s] with %lld %lld",
-               word.toAscii().data(), wl.pos, wl.len);
-        
-        definitions.seek(wl.pos);
-        QByteArray data = definitions.read(wl.len);
-        QString ret(data);
-        return ret;
-    }
+     if (words.contains(word))
+     {
+         QString docs_path;
+         docs_path = QDir::homePath() + QDir::separator() + "Documents";
+         WhitLocation wl = words[word];
+         QFile definitions(docs_path+"/definitions.cal");
+         if (!definitions.open(QIODevice::ReadOnly))
+         {
+             qDebug("Can't open definitions.cal");
+             return "";
+         }
 
-    return "";
-}
+         qDebug("Matching [%s] with %lld %lld",
+                word.toAscii().data(), wl.pos, wl.len);
 
-void WhitakerDictionary::doLoad()
-{
-    QString docs_path;
-    docs_path = QDir::homePath() + QDir::separator() + "Documents";
-    QFile index(docs_path+"/index.cal");
-    if (!index.open(QIODevice::ReadOnly))
-    {
-        qDebug("Can't open index.cal");
-        return;
-    }
+         definitions.seek(wl.pos);
+         QByteArray data = definitions.read(wl.len);
+         QString ret(data);
+         return ret;
+     }
+     else
+     {
+         qDebug("Can't find [%s]", word.toAscii().data());
+         return "Unknown";
+     }
+ }
 
-    while(!index.atEnd())
-    {
-        WhitLocation wl;
-        QString word;
-        word = index.readLine();
-        QString poss = index.readLine();
-        QString lens = index.readLine();
+ void WhitakerDictionary::doLoad()
+ {
+     QString docs_path;
+     docs_path = QDir::homePath() + QDir::separator() + "Documents";
 
-        word.remove("\n");
-        wl.pos = poss.toLongLong();
-        wl.len = lens.toLongLong();
-        words[word] = wl;
-    }
+         /*
+     QFile index(docs_path+"/indexhash.cal");
+     if (!index.open(QIODevice::ReadOnly))
+     {
+         qDebug("Can't open indexhash.cal");
+         return;
+     }
+     QDataStream qds(&index);
+     qds >> words;
+     */
+         
+     QFile index(docs_path+"/index.cal");
+     if (!index.open(QIODevice::ReadOnly))
+     {
+         qDebug("Can't open indexhash.cal");
+         return;
+     }
+     QTextStream qds(&index);
+     while (!qds.atEnd())
+     {
+         QString word,pos,len;
+         word = qds.readLine();
+         pos = qds.readLine();
+         len = qds.readLine();
+         word.remove("\n");
+         WhitLocation wl;
+         wl.pos = pos.toLongLong();
+         wl.len = len.toLongLong();
+         words[word] = wl;
+     }
 
-    qDebug("Read %d entries", words.size());
-    loaded = true;
-}
+     loaded = true;
+ }
 
