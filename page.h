@@ -43,6 +43,9 @@ class Page : public QFrame
     
     void mouseFindElement(qint64 x, qint64 y);
     void displayMessage(QString caption, QString message);
+
+    void reflow();
+    void getSettings();
     
   public slots:
 
@@ -51,6 +54,7 @@ class Page : public QFrame
     void biggerPushed();
     void smallerPushed();
     void filtersPushed();
+    void settingsPushed();
     
   protected:
 

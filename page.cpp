@@ -11,6 +11,7 @@
 #include "bookdevice.h"
 #include "filterpicker.h"
 #include "settings.h"
+#include "settingsscreen.h"
 
 //#define DEBUG_LAYOUT
 
@@ -39,11 +40,13 @@ Page::Page(Mobi * m, Parser * p)
     QAction * bigger_action = new QAction(QIcon(":/images/bigger.png"), "Bigger", this);
     QAction * smaller_action = new QAction(QIcon(":/images/smaller.png"), "Smaller", this);
     QAction * filters_action = new QAction(QIcon(":/images/filters.png"), "Filters", this);
+    QAction * settings_action = new QAction(QIcon(":/images/settings.png"), "Settings", this);
     buttonbar->addAction(back_action);
     buttonbar->addAction(dump_action);
     buttonbar->addAction(bigger_action);
     buttonbar->addAction(smaller_action);
     buttonbar->addAction(filters_action);
+    buttonbar->addAction(settings_action);
 #if defined(SPOONJUGGLINGBABOONS)
     menubar = new QMenuBar(this);
     QMenu * menu = menubar->addMenu("&Menu");
@@ -52,6 +55,7 @@ Page::Page(Mobi * m, Parser * p)
     menu->addAction(bigger_action);
     menu->addAction(smaller_action);
     menu->addAction(filters_action);
+    menu->addAction(settings_action);
     menubar->setAutoFillBackground(true);
 #else
     menubar = 0;
@@ -61,13 +65,10 @@ Page::Page(Mobi * m, Parser * p)
     connect(bigger_action, SIGNAL(triggered()), this, SLOT(biggerPushed()));
     connect(smaller_action, SIGNAL(triggered()), this, SLOT(smallerPushed()));
     connect(filters_action, SIGNAL(triggered()), this, SLOT(filtersPushed()));
+    connect(settings_action, SIGNAL(triggered()), this, SLOT(settingsPushed()));
     buttonbar->setAutoFillBackground(true);
     buttonbar->hide();
-    
-    fontsize = settings->getFontSize();
-    margin = settings->getMargin();
-    indent = settings->getIndent();
-    font = settings->getFont();
+    getSettings();
 }
 
 Page::~Page()
@@ -90,7 +91,22 @@ void Page::displayMessage(QString caption, QString message)
 {
     QMessageBox::about(this, caption, message);
 }
-    
+
+void Page::reflow()
+{
+    clearElements();
+    findElements();
+    update();
+}
+
+void Page::getSettings()
+{
+    fontsize = settings->getFontSize();
+    margin = settings->getMargin();
+    indent = settings->getIndent();
+    font = settings->getFont();
+}
+
 void Page::resizeEvent(QResizeEvent *)
 {
     if (buttonbar->isVisible())
@@ -112,9 +128,7 @@ void Page::resizeEvent(QResizeEvent *)
     settings->setWidth(width());
     settings->setHeight(height());
 
-    clearElements();
-    findElements();
-    update();
+    reflow();
 }
 
 void Page::mouseReleaseEvent(QMouseEvent * event)
@@ -393,8 +407,7 @@ void Page::biggerPushed()
 {
     fontsize += 2;
     settings->setFontSize(fontsize);
-    clearElements();
-    findElements();
+    reflow();
 }
 
 void Page::smallerPushed()
@@ -404,9 +417,7 @@ void Page::smallerPushed()
         fontsize -= 2;
     }
     settings->setFontSize(fontsize);
-    clearElements();
-    findElements();
-    update();
+    reflow();
 }
 
 void Page::filtersPushed()
@@ -415,6 +426,14 @@ void Page::filtersPushed()
     fp->setGeometry(0,0,width(),height());
     fp->raise();
     fp->show();
+}
+
+void Page::settingsPushed()
+{
+    SettingsScreen * ss = new SettingsScreen(this);
+    ss->setGeometry(0,0,width(),height());
+    ss->raise();
+    ss->show();
 }
 
 int Page::pageStart()

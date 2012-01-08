@@ -82,6 +82,7 @@ qint64 ParagraphElement::height()
 void ParagraphElement::render(qint64 offset)
 {
     QFont f;
+    f.setFamily(page->getFont());
     f.setPointSize(page->getFontSize());
     QPainter p(page);
     
