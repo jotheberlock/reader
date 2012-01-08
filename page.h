@@ -39,6 +39,7 @@ class Page : public QFrame
     qint64 getMargin() { return margin; }
     qint64 getIndent() { return indent; }
     qint64 getFontSize() { return fontsize; }
+    QString getFont() { return font; }
     
     void mouseFindElement(qint64 x, qint64 y);
     void displayMessage(QString caption, QString message);
@@ -70,6 +71,7 @@ class Page : public QFrame
     qint64 margin;
     qint64 indent;
     qint64 fontsize;
+    QString font;
     
     Mobi * mobi;
     Parser * parser;

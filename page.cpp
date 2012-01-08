@@ -67,6 +67,7 @@ Page::Page(Mobi * m, Parser * p)
     fontsize = settings->getFontSize();
     margin = settings->getMargin();
     indent = settings->getIndent();
+    font = settings->getFont();
 }
 
 Page::~Page()

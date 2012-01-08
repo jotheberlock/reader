@@ -28,7 +28,7 @@ qint64 ParagraphElement::height()
     for (int loopc=0; loopc<fragments.size(); loopc++)
     {
         StringFragment & sf = fragments[loopc];
-        QFont metrics;
+        QFont metrics(page->getFont());
         metrics.setPointSize(page->getFontSize());
         metrics.setItalic(sf.is_italic);
         metrics.setBold(sf.is_bold);
