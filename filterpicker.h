@@ -3,6 +3,7 @@
 
 #include <QtGui/QWidget>
 #include <QtGui/QBoxLayout>
+#include "settings.h"
 #include "filter.h"
 
 class FilterPicker : public QWidget

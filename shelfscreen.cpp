@@ -4,6 +4,7 @@
 #include "page.h"
 #include "bookdevice.h"
 #include "parser.h"
+#include "settings.h"
 
 Shelfscreen::Shelfscreen()
 {
@@ -28,9 +29,8 @@ void Shelfscreen::readSlot()
         if(se.text == sender())
         {
             se.book->open();
-            settings->setValue("currentbook", se.book->getFullName());
-            settings->setValue("currentpage", 0);
-            settings->sync();
+            settings->setCurrentBook(se.book->getFullName());
+            settings->setCurrentPage(0);
             BookDevice * bd = new BookDevice(se.book);
             bd->open(QIODevice::ReadOnly);
             Parser * parser = new Parser(bd, se.book);
@@ -51,9 +51,8 @@ bool Shelfscreen::readBook(QString book)
         if(se.book->getFullName() == book)
         {
             se.book->open();
-            settings->setValue("currentbook", book);
-            settings->setValue("currentpage", 0);
-            settings->sync();
+            settings->setCurrentBook(se.book->getFullName());
+            settings->setCurrentPage(0);
             BookDevice * bd = new BookDevice(se.book);
             bd->open(QIODevice::ReadOnly);
             Parser * parser = new Parser(bd, se.book);

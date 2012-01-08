@@ -21,6 +21,5 @@ class Bookshelf
 };
 
 extern Bookshelf * bookshelf;
-extern QSettings * settings;
 
 #endif

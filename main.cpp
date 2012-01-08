@@ -13,10 +13,11 @@
 #include "filter.h"
 #include "dictionaryfilter.h"
 #include "whitaker.h"
+#include "settings.h"
 
 Bookshelf * bookshelf;
 QStackedWidget * top_level;
-QSettings * settings;
+Settings * settings;
 
 FilterManager * filter_manager;
 
@@ -27,10 +28,11 @@ int main(int argc, char ** argv)
     font.setBold(true);
     app.setFont(font);
 
+    settings = new Settings();
+    
     filter_manager = new FilterManager();
     filter_manager->addFilter(new DictionaryFilter(new WhitakerDictionary()));
     
-    settings = new QSettings("Joel Dillon", "Calliope eReader");
     bookshelf = new Bookshelf;
 
     QString docs_path;
@@ -40,37 +42,31 @@ int main(int argc, char ** argv)
     
     Shelfscreen * shelfscreen = new Shelfscreen;
     
-    shelfscreen->update();
-    shelfscreen->resize(480,640);
-        //shelfscreen->resize(shelfscreen->minimumSize());
     QScrollArea * qsa = new QScrollArea;
-    qsa->setWidget(shelfscreen);
-     
+    qsa->setWidgetResizable(true);
+    qsa->setWidget(shelfscreen); 
+    shelfscreen->update();
+    
     top_level = new QStackedWidget;
     top_level->addWidget(qsa);
-    top_level->show();
 
-    QString cbook = settings->value("currentbook").toString();
-    int cpage = settings->value("currentpage").toInt();
-    int w = settings->value("width").toInt();
-    int h = settings->value("height").toInt();
-
-    if (settings->contains("active_touch"))
-    {
-        Filter * f = filter_manager->getFilter(settings->value("active_touch").toString());
-        filter_manager->setActiveTouchFilter(f);
-    }
+    Filter * f = filter_manager->getFilter(settings->getActiveTouch());
+    filter_manager->setActiveTouchFilter(f);
     
-    if (shelfscreen->readBook(cbook))
+    if (shelfscreen->readBook(settings->getCurrentBook()))
     {
-        shelfscreen->currentPage()->setPage(cpage);
+        shelfscreen->currentPage()->setPage(settings->getCurrentPage());
     }
 
-                              
-    if (w > 0 && h > 0)
+    printf("%d %d\n", settings->getX(), settings->getY());
+    
+    top_level->setGeometry(settings->getX(), settings->getY(),
+                           settings->getWidth(), settings->getHeight());
+    if (settings->getFullScreen())
     {
-        top_level->resize(w,h);
+        top_level->setWindowState(top_level->windowState() ^ Qt::WindowFullScreen);
     }
+    top_level->show();
     
     app.exec();
 }

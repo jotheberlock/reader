@@ -4,8 +4,6 @@
 
 #include "filterpicker.h"
 
-extern QSettings * settings;
-
 FilterPicker::FilterPicker(QWidget * parent)
     : QWidget(parent)
 {
@@ -17,11 +15,7 @@ FilterPicker::FilterPicker(QWidget * parent)
         QCheckBox * filterbox = new QCheckBox(filter->name());
         layout->addWidget(filterbox,1);
         filter_mapper[filterbox] = filter;
-        QString setting_name = "filter_"+filter->name();
-        if (settings->contains(setting_name))
-        {
-            filter->setActive(settings->value(setting_name).toBool());
-        }
+        filter->setActive(settings->getFilterActive(filter->name()));
         filterbox->setChecked(filter->getActive());
         connect(filterbox, SIGNAL(stateChanged(int)), this, SLOT(filterChanged(int)));
     }
@@ -40,8 +34,7 @@ void FilterPicker::filterChanged(int state)
         return;
     }
 
-    QString setting_name = "filter_"+filter->name();
-    settings->setValue(setting_name, (state == Qt::Checked));
+    settings->setFilterActive(filter->name(), state == Qt::Checked);
     filter->setActive(state == Qt::Checked);
 }
 

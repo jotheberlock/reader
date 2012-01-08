@@ -9,8 +9,8 @@
 #include "parser.h"
 #include "shelfscreen.h"
 #include "bookdevice.h"
-#include "wordplugin.h"
 #include "filterpicker.h"
+#include "settings.h"
 
 //#define DEBUG_LAYOUT
 
@@ -64,11 +64,9 @@ Page::Page(Mobi * m, Parser * p)
     buttonbar->setAutoFillBackground(true);
     buttonbar->hide();
     
-    int f = settings->value("fontsize").toInt();
-    fontsize = (f > 0) ? f : 36;
-    
-    indent = 20;
-    margin = 50;
+    fontsize = settings->getFontSize();
+    margin = settings->getMargin();
+    indent = settings->getIndent();
 }
 
 void Page::paintEvent(QPaintEvent *)
@@ -94,9 +92,14 @@ void Page::resizeEvent(QResizeEvent *)
     {
         menubar->setGeometry(0, 0, width(), menubar->height());
     }
+        // This bit is a little hacky since we're not the top level window
+    QPoint topleft = mapToGlobal(QPoint(0,0));
+    settings->setX(topleft.x());
+    settings->setY(topleft.y());
 
-    settings->setValue("width", width());
-    settings->setValue("height", height());
+    settings->setWidth(width());
+    settings->setHeight(height());
+
     clearElements();
     findElements();
     update();
@@ -345,16 +348,14 @@ void Page::setPage(qint64 p)
 {   
     current_page = p;
     findElements();
-    settings->setValue("currentpage", current_page);
-    settings->sync();
+    settings->setCurrentPage(current_page);
     update();
 }
 
 void Page::backPushed()
 {
-    settings->setValue("currentbook", "");
-    settings->setValue("currentpage", 0);
-    settings->sync();
+    settings->setCurrentBook("");
+    settings->setCurrentPage(0);
     top_level->setCurrentIndex(0);
     top_level->removeWidget(this);
     delete this;
@@ -379,7 +380,7 @@ void Page::dumpPushed()
 void Page::biggerPushed()
 {
     fontsize += 2;
-    settings->setValue("fontsize", fontsize);
+    settings->setFontSize(fontsize);
     clearElements();
     findElements();
 }
@@ -390,7 +391,7 @@ void Page::smallerPushed()
     {
         fontsize -= 2;
     }
-    settings->setValue("fontsize", fontsize);
+    settings->setFontSize(fontsize);
     clearElements();
     findElements();
     update();
