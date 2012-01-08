@@ -3,6 +3,7 @@
 #include <QtCore/QTextStream>
 
 #include "whitaker.h"
+#include "bookshelf.h"
 
  QDataStream & operator>> ( QDataStream & out, WhitLocation val )
  {
@@ -23,13 +24,15 @@
          QString docs_path;
          docs_path = QDir::homePath() + QDir::separator() + "Documents";
          WhitLocation wl = words[word];
-         QFile definitions(docs_path+"/definitions.cal");
-         if (!definitions.open(QIODevice::ReadOnly))
+
+         QString dpath = bookshelf->getFile("whitdefinitions.cal");
+         if (dpath == "")
          {
-             qDebug("Can't open definitions.cal");
+             qDebug("Can't open definitions file");
              return "";
          }
-
+         QFile definitions(dpath);
+         definitions.open(QIODevice::ReadOnly);
          qDebug("Matching [%s] with %lld %lld",
                 word.toAscii().data(), wl.pos, wl.len);
 
@@ -47,9 +50,6 @@
 
  void WhitakerDictionary::doLoad()
  {
-     QString docs_path;
-     docs_path = QDir::homePath() + QDir::separator() + "Documents";
-
          /*
      QFile index(docs_path+"/indexhash.cal");
      if (!index.open(QIODevice::ReadOnly))
@@ -60,13 +60,15 @@
      QDataStream qds(&index);
      qds >> words;
      */
-         
-     QFile index(docs_path+"/index.cal");
-     if (!index.open(QIODevice::ReadOnly))
+     QString ipath = bookshelf->getFile("whitindex.cal");
+     if (ipath == "")
      {
-         qDebug("Can't open indexhash.cal");
+         qDebug("Can't open definitions file");
          return;
      }
+     
+     QFile index(ipath);
+     index.open(QIODevice::ReadOnly);
      QTextStream qds(&index);
      while (!qds.atEnd())
      {

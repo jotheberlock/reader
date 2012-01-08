@@ -34,6 +34,8 @@ class Parser
   public:
 
     Parser(QIODevice * d, Mobi * m);
+    ~Parser();
+    
     Element * next();
 
     void dumpTag(Tag *);

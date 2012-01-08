@@ -111,7 +111,9 @@ class Mobi
 
     bool sniff(QIODevice *);
     void open();
-
+    void close();
+    bool isOpen();
+    
     int numBlocks()
     {
         return palmdoc_header->record_count;

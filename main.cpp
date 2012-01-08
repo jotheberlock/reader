@@ -36,11 +36,15 @@ int main(int argc, char ** argv)
     bookshelf = new Bookshelf;
 
     QString docs_path;
-    docs_path = QDir::homePath() + QDir::separator() + "Documents";
-    bookshelf->scanDirectory(docs_path);
-    bookshelf->scanDirectory("/sdcard/kindle");
+    docs_path = QDir::homePath() + QDir::separator();
+    bookshelf->addPath(docs_path + "Documents");
+    bookshelf->addPath(docs_path + "calliope");
+    bookshelf->addPath("/sdcard/kindle");
+    bookshelf->addPath("/sdcard/calliope");
     
     Shelfscreen * shelfscreen = new Shelfscreen;
+    shelfscreen->updateSlot();
+    QObject::connect(bookshelf, SIGNAL(shelfChanged()), shelfscreen, SLOT(updateSlot()));
     
     QScrollArea * qsa = new QScrollArea;
     qsa->setWidgetResizable(true);
@@ -49,7 +53,8 @@ int main(int argc, char ** argv)
     
     top_level = new QStackedWidget;
     top_level->addWidget(qsa);
-
+    
+    settings->setActiveTouch("Dictionary");
     Filter * f = filter_manager->getFilter(settings->getActiveTouch());
     filter_manager->setActiveTouchFilter(f);
     
@@ -57,8 +62,6 @@ int main(int argc, char ** argv)
     {
         shelfscreen->currentPage()->setPage(settings->getCurrentPage());
     }
-
-    printf("%d %d\n", settings->getX(), settings->getY());
     
     top_level->setGeometry(settings->getX(), settings->getY(),
                            settings->getWidth(), settings->getHeight());

@@ -421,4 +421,13 @@ void Mobi::open()
     device->open(QIODevice::ReadOnly);
 }
 
+void Mobi::close()
+{
+    device->close();
+}
+
+bool Mobi::isOpen()
+{
+    return device->isOpen();
+}
 

@@ -19,7 +19,8 @@ class Page : public QFrame
   public:
 
     Page(Mobi *, Parser *);
-
+    ~Page();
+    
     virtual void mouseReleaseEvent(QMouseEvent *);
     virtual void paintEvent(QPaintEvent *);
     virtual void resizeEvent(QResizeEvent *);

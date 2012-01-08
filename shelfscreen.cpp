@@ -12,8 +12,9 @@ Shelfscreen::Shelfscreen()
     quit_button->setObjectName("quitbutton");
     quit_button->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     connect(quit_button, SIGNAL(clicked()), this, SLOT(quitSlot()));
-    layout = new QGridLayout(this);
+    layout = 0;
     current_page = 0;
+    layout = new QGridLayout(this);
 }
 
 void Shelfscreen::quitSlot()
@@ -68,8 +69,15 @@ bool Shelfscreen::readBook(QString book)
     return false;  
 }
 
-void Shelfscreen::update()
-{
+void Shelfscreen::updateSlot()
+{   
+    for (int loopc=0; loopc<elements.size(); loopc++)
+    {
+        delete elements[loopc].image;
+        delete elements[loopc].text;
+    }
+    elements.clear();
+    
     for (int loopc=0; loopc<bookshelf->numBooks(); loopc++)
     {
         Mobi * mobi = bookshelf->getBook(loopc);
@@ -94,4 +102,5 @@ void Shelfscreen::update()
 
     layout->addWidget(quit_button, bookshelf->numBooks(), 1);
     layout->setRowStretch(bookshelf->numBooks(), 1);
+    update();
 }

@@ -4,6 +4,51 @@
 #include <QtCore/QTextStream>
 #include <QtGui/QApplication>
 
+Bookshelf::Bookshelf()
+    : QObject(0)
+{
+    watcher = new QFileSystemWatcher();
+    connect(watcher, SIGNAL(directoryChanged(const QString &)), this,
+            SLOT(dirChange(const QString &)));
+}
+
+Bookshelf::~Bookshelf()
+{
+    delete watcher;
+}
+
+void Bookshelf::addPath(QString d)
+{
+    qDebug("Adding path %s", d.toAscii().data());
+    
+    QDir dir(d);
+    if (!dir.exists())
+    {
+        return;
+    }
+    
+    if (!directories.contains(d))
+    {
+        directories.push_back(d);
+        scanDirectory(d);
+    }
+
+    watcher->addPath(d);
+}
+
+QString Bookshelf::getFile(QString name)
+{
+    for (int loopc=0; loopc<directories.size(); loopc++)
+    {
+        QFile ret(directories[loopc]+QDir::separator()+name);
+        if (ret.exists() && ret.open(QIODevice::ReadOnly))
+        {
+            return ret.fileName();
+        }   
+    }
+    return "";
+}
+
 void Bookshelf::scanDirectory(QString d)
 {
     QDir dir(d);
@@ -58,3 +103,23 @@ int Bookshelf::numBooks()
 {
     return books.size();
 }
+
+void Bookshelf::dirChange(const QString &)
+{
+    for (int loopc=0; loopc<books.size(); loopc++)
+    {
+        if (!books[loopc]->isOpen())
+        {
+            delete books[loopc];
+        }
+    }
+    books.clear();
+    for (int loopc=0; loopc<directories.size(); loopc++)
+    {
+        scanDirectory(directories[loopc]);
+    }
+
+    emit shelfChanged();
+}
+
+

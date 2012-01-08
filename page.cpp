@@ -69,6 +69,17 @@ Page::Page(Mobi * m, Parser * p)
     indent = settings->getIndent();
 }
 
+Page::~Page()
+{
+    for (int loopc=0; loopc<elements.size(); loopc++)
+    {
+        delete elements[loopc];
+    }
+
+    mobi->close();
+    delete parser;
+}
+
 void Page::paintEvent(QPaintEvent *)
 {
     layoutElements();

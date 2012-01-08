@@ -91,6 +91,16 @@ Parser::Parser(QIODevice * d, Mobi * m)
     special_entities["oelig"] = QChar(0x0153);
 }
 
+Parser::~Parser()
+{
+    while (tags.size() > 0)
+    {
+        delete tags.pop();
+    }
+    
+    delete device;
+}
+
 void Parser::reset()
 {
     device->reset();

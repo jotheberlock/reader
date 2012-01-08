@@ -27,10 +27,10 @@ class Shelfscreen : public QWidget
   public:
 
     Shelfscreen();
-    void update();
 
     public slots:
 
+    void updateSlot();
     void quitSlot();
     void readSlot();
     bool readBook(QString);
