@@ -105,6 +105,7 @@ void Page::getSettings()
     margin = settings->getMargin();
     indent = settings->getIndent();
     font = settings->getFont();
+    leading = settings->getLeading();
 }
 
 void Page::resizeEvent(QResizeEvent *)
@@ -371,10 +372,12 @@ void Page::previousPage()
 }
 
 void Page::setPage(qint64 p)
-{   
+{
+    printf("Setting page to %lld\n", p);
     current_page = p;
     findElements();
     settings->setCurrentPage(current_page);
+    settings->save();
     update();
 }
 

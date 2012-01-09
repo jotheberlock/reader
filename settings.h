@@ -25,6 +25,9 @@ class Settings
     
     void setIndent(int);
     int getIndent();
+    
+    void setLeading(int);
+    int getLeading();
 
     void setCurrentPage(int);
     int getCurrentPage();

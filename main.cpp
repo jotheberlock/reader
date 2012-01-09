@@ -57,10 +57,11 @@ int main(int argc, char ** argv)
     settings->setActiveTouch("Dictionary");
     Filter * f = filter_manager->getFilter(settings->getActiveTouch());
     filter_manager->setActiveTouchFilter(f);
-    
+
+    qint64 the_page = settings->getCurrentPage();
     if (shelfscreen->readBook(settings->getCurrentBook()))
     {
-        shelfscreen->currentPage()->setPage(settings->getCurrentPage());
+        shelfscreen->currentPage()->setPage(the_page);
     }
     
     top_level->setGeometry(settings->getX(), settings->getY(),

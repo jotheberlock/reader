@@ -20,6 +20,8 @@ SettingsScreen::SettingsScreen(Page * p)
     margin->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
     indent = new QLineEdit();
     indent->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+    leading = new QLineEdit();
+    leading->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
     active_touch = new QComboBox();
     active_touch->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
     quit_button = new QPushButton("Apply");
@@ -28,6 +30,7 @@ SettingsScreen::SettingsScreen(Page * p)
     font_size->setValidator(new QIntValidator);
     margin->setValidator(new QIntValidator);
     indent->setValidator(new QIntValidator);
+    leading->setValidator(new QIntValidator);
     
     layout->addWidget(new QLabel("Font"), 0, 0);
     layout->addWidget(font, 0, 1);
@@ -37,10 +40,12 @@ SettingsScreen::SettingsScreen(Page * p)
     layout->addWidget(margin, 2, 1);
     layout->addWidget(new QLabel("Indent"), 3, 0);
     layout->addWidget(indent, 3, 1);
-    layout->addWidget(new QLabel("Touch handler"), 4, 0);
-    layout->addWidget(active_touch, 4, 1);
-    layout->addWidget(cancel_button,5,0);
-    layout->addWidget(quit_button,5,1);
+    layout->addWidget(new QLabel("Leading"), 4, 0);
+    layout->addWidget(leading, 4, 1);
+    layout->addWidget(new QLabel("Touch handler"), 5, 0);
+    layout->addWidget(active_touch, 5, 1);
+    layout->addWidget(cancel_button,6,0);
+    layout->addWidget(quit_button,6,1);
     
     QFontDatabase fontdb;
     font->insertItems(0,fontdb.families());
@@ -56,6 +61,7 @@ SettingsScreen::SettingsScreen(Page * p)
     font_size->setText(QString::number(settings->getFontSize()));
     margin->setText(QString::number(settings->getMargin()));
     indent->setText(QString::number(settings->getIndent()));
+    leading->setText(QString::number(settings->getLeading()));
     if (filter_manager->getActiveTouchFilter())
     {
         active_touch->setCurrentIndex(font->findText(filter_manager->getActiveTouchFilter()->name()));
@@ -73,6 +79,7 @@ void SettingsScreen::quitPressed()
     settings->setFontSize(font_size->text().toInt());
     settings->setMargin(margin->text().toInt());
     settings->setIndent(indent->text().toInt());
+    settings->setLeading(leading->text().toInt());
     settings->setActiveTouch(active_touch->currentText());
     
     filter_manager->setActiveTouchFilter(

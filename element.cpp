@@ -50,7 +50,7 @@ qint64 ParagraphElement::height()
                    word.text.toAscii().data());
                 */
 
-            line_length = qfm.lineSpacing();
+            line_length = qfm.lineSpacing() + page->getLeading();
             
             if ( (xpos + adv) > (page->getPageWidth() - page->getMargin()))
             {

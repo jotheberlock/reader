@@ -38,6 +38,7 @@ class Page : public QFrame
     qint64 getPageHeight() { return pageHeight(); }
     qint64 getMargin() { return margin; }
     qint64 getIndent() { return indent; }
+    qint64 getLeading() { return leading; }
     qint64 getFontSize() { return fontsize; }
     QString getFont() { return font; }
     
@@ -75,6 +76,7 @@ class Page : public QFrame
     qint64 margin;
     qint64 indent;
     qint64 fontsize;
+    qint64 leading;
     QString font;
     
     Mobi * mobi;

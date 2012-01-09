@@ -28,6 +28,7 @@ class SettingsScreen : public QWidget
     QLineEdit * font_size;
     QLineEdit * margin;
     QLineEdit * indent;
+    QLineEdit * leading;
     QComboBox * active_touch;
     
     QGridLayout * layout;

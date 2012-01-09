@@ -92,6 +92,17 @@ int Settings::getIndent()
     return settings.value("indent").toInt();
 }
 
+void Settings::setLeading(int l)
+{
+    needs_reflow = needs_reflow || (l != getLeading());
+    settings.setValue("leading", l);
+}
+
+int Settings::getLeading()
+{
+    return settings.value("leading").toInt();
+}
+
 void Settings::setCurrentPage(int p)
 {
     settings.setValue("currentpage", p);
