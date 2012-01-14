@@ -4,6 +4,7 @@
 
 #include "element.h"
 #include "page.h"
+#include "filter.h"
 
 qint64 ParagraphElement::height()
 {
@@ -14,6 +15,16 @@ qint64 ParagraphElement::height()
 
     words.clear();
     cached_height = 0;
+
+        // Apply before filters
+    QList<Filter *> filters = filter_manager->getFilters();
+    for (int loopc=0; loopc<filters.size(); loopc++)
+    {
+        if (filters[loopc]->getActive())
+        {
+            filters[loopc]->beforeLayout(this);
+        }
+    }
     
     qint64 xpos = page->getIndent() + page->getMargin();
     qint64 ypos = current_position;
@@ -24,6 +35,8 @@ qint64 ParagraphElement::height()
     page_end += page->getPageHeight();
 
     qint64 line_length = 0;
+
+    int count = 0;
     
     for (int loopc=0; loopc<fragments.size(); loopc++)
     {
@@ -41,7 +54,9 @@ qint64 ParagraphElement::height()
             word.ly = ypos;
             word.w = qfm.width(word.text);
             word.h = qfm.height();
-
+            word.index = count;
+            count++;
+            
             qint64 adv = word.w + qfm.width(" ");
 
                 /*
@@ -75,6 +90,16 @@ qint64 ParagraphElement::height()
         }
     }
 
+    for (int loopc=0; loopc<filters.size(); loopc++)
+    {
+        if (filters[loopc]->getActive())
+        {
+            filters[loopc]->afterLayout(this);
+        }
+    }
+
+        // Should calculate height properly here in
+        // case after filters changed it
     cached_height += line_length;
     return cached_height;
 }
@@ -96,20 +121,21 @@ void ParagraphElement::render(qint64 offset)
     }    
 }
 
-QString ParagraphElement::hitTest(qint64 x, qint64 y)
-{
-    height();  // Ensure word list is built - it should be but no harm in being safe
+
+Word ParagraphElement::getWord(qint64 x, qint64 y)
+{   
     for (int loopc=0; loopc<words.size(); loopc++)
     {
         Word & word = words[loopc];
         if (x>=word.lx && y>=word.ly &&
             x<=(word.lx+word.w) && y<=(word.ly+word.h))
         {
-            return word.text;
+            return words[loopc];
         }
     }
 
-    return "";
+    Word dummy;
+    return dummy;
 }
 
 qint64 PictureElement::height()

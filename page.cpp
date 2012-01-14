@@ -69,6 +69,15 @@ Page::Page(Mobi * m, Parser * p)
     buttonbar->setAutoFillBackground(true);
     buttonbar->hide();
     getSettings();
+ 
+    QList<Filter *> filters = filter_manager->getFilters();
+    for (int loopc=0; loopc<filters.size(); loopc++)
+    {
+        if (filters[loopc]->getActive())
+        {
+            filters[loopc]->newBook(this);
+        }
+    }   
 }
 
 Page::~Page()
@@ -383,6 +392,15 @@ void Page::setPage(qint64 p)
 
 void Page::backPushed()
 {
+    QList<Filter *> filters = filter_manager->getFilters();
+    for (int loopc=0; loopc<filters.size(); loopc++)
+    {
+        if (filters[loopc]->getActive())
+        {
+            filters[loopc]->endBook(this);
+        }
+    }
+    
     settings->setCurrentBook("");
     settings->setCurrentPage(0);
     top_level->setCurrentIndex(0);

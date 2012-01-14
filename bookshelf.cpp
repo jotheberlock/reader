@@ -65,7 +65,7 @@ void Bookshelf::scanDirectory(QString d)
         QFile * file = new QFile(fname);
             
         Mobi * mobi = new Mobi;
-        if (mobi->sniff(file, file->fileName()))
+        if (mobi->sniff(file, entries[loopc]))
         {
             qDebug("Adding [%s]", fname.toAscii().data());
             books.push_back(mobi);
@@ -121,4 +121,20 @@ void Bookshelf::dirChange(const QString &)
     emit shelfChanged();
 }
 
+QDir Bookshelf::getSaveDirectory()
+{
+#if defined(Q_OS_ANDROID)
+    QDir save("/sdcard/calliope");
+#else
+    QString docs_path;
+    docs_path = QDir::homePath() + QDir::separator();
+    QDir save(docs_path+"calliope");
+#endif
+    if (!save.exists())
+    {
+        save.mkpath(save.path());
+    }
+
+    return save;
+}
 

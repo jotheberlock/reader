@@ -1,6 +1,7 @@
 #include <QtCore/QFile>
 #include <QtCore/QDir>
 #include <QtCore/QTextStream>
+#include <QtGui/QApplication>
 
 #include "whitaker.h"
 #include "bookshelf.h"
@@ -66,7 +67,9 @@
          qDebug("Can't open definitions file");
          return;
      }
-     
+
+     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+          
      QFile index(ipath);
      index.open(QIODevice::ReadOnly);
      QTextStream qds(&index);
@@ -84,5 +87,6 @@
      }
 
      loaded = true;
- }
+     QApplication::restoreOverrideCursor();
+}
 

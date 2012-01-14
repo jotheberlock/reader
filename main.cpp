@@ -13,6 +13,7 @@
 #include "filter.h"
 #include "dictionaryfilter.h"
 #include "whitaker.h"
+#include "wordchangerfilter.h"
 #include "settings.h"
 #include "calliope_application.h"
 
@@ -29,6 +30,7 @@ int main(int argc, char ** argv)
     settings = new Settings();
     
     filter_manager = new FilterManager();
+    filter_manager->addFilter(new WordChangerFilter());
     filter_manager->addFilter(new DictionaryFilter(new WhitakerDictionary()));
     
     bookshelf = new Bookshelf;
@@ -52,7 +54,7 @@ int main(int argc, char ** argv)
     top_level = new QStackedWidget;
     top_level->addWidget(qsa);
     
-    settings->setActiveTouch("Dictionary");
+    settings->setActiveTouch("Word changer");
     Filter * f = filter_manager->getFilter(settings->getActiveTouch());
     filter_manager->setActiveTouchFilter(f);
 

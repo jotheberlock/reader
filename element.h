@@ -93,6 +93,7 @@ class Word
     qint64 x,y;
         // Bounding box
     qint64 lx,ly, w, h;
+    int index;    // The xth word of the paragraph as in stringfragment
     
 };
 
@@ -115,15 +116,21 @@ class ParagraphElement : public Element
     {
         return fragments.size();
     }
+
+    QList<StringFragment> & getFragments()
+    {
+        return fragments;
+    }
     
     virtual qint64 height();
     virtual void render(qint64 offset);
-    virtual QString hitTest(qint64 x, qint64 y);
 
     QList<Word> & getWords()
     {
         return words;
     }
+
+    Word getWord(qint64 x, qint64 y);
     
   protected:
     

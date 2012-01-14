@@ -4,6 +4,7 @@
 #include <QtCore/QList>
 #include <QtCore/QFile>
 #include <QtCore/QFileSystemWatcher>
+#include <QtCore/QDir>
 
 #include "mobi.h"
 
@@ -24,6 +25,8 @@ class Bookshelf : public QObject
         // Looks in all directories for a file with a specific name
     QString getFile(QString name);
 
+    QDir getSaveDirectory();
+    
   signals:
 
     void shelfChanged();
