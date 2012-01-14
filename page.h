@@ -41,6 +41,9 @@ class Page : public QFrame
     qint64 getLeading() { return leading; }
     qint64 getFontSize() { return fontsize; }
     QString getFont() { return font; }
+
+    Mobi * getMobi() { return mobi; }
+    Parser * getParser() { return parser; }
     
     void mouseFindElement(qint64 x, qint64 y);
     void displayMessage(QString caption, QString message);

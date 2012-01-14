@@ -29,14 +29,21 @@ class Filter
 
     virtual bool handlesTouch() = 0;
     virtual QString name() = 0;
+
+        // Called every time a different book is opened
+    virtual void newBook(Page *) {}
+        // Called when book is closed
+    virtual void endBook(Page *) {}
         // Called before StringFragments are laid out
-    virtual void beforeLayout(ParagraphElement *) = 0;
+    virtual void beforeLayout(ParagraphElement *) {}
         // Called after Words are positioned
-    virtual void afterLayout(ParagraphElement *) = 0;
-        // Called on mouse/touch press - virtual coordinates
-    virtual void onPress(ParagraphElement *, Page *, qint64 x, qint64 y) = 0;
+    virtual void afterLayout(ParagraphElement *) {}
+        // Called on mouse/touch press - virtual coordinates 
+    virtual void onPress(ParagraphElement *, Page *,
+                         qint64 /*x*/, qint64 /*y*/) {}
         // Called on mouse/touch release - virtual coordinates
-    virtual void onRelease(ParagraphElement *, Page *, qint64 x, qint64 y) = 0;
+    virtual void onRelease(ParagraphElement *, Page *,
+                           qint64 /*x*/, qint64 /*y*/) {}
 
   protected:
 

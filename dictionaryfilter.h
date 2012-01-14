@@ -20,9 +20,6 @@ class DictionaryFilter : public Filter
         return "Dictionary";
     }
     
-    virtual void beforeLayout(ParagraphElement *) {}
-    virtual void afterLayout(ParagraphElement *) {}    
-    virtual void onPress(ParagraphElement *, Page *, qint64, qint64) {}
     virtual void onRelease(ParagraphElement *, Page *, qint64 x, qint64 y);
     virtual bool handlesMouse() { return true; }
     

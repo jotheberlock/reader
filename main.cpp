@@ -14,6 +14,7 @@
 #include "dictionaryfilter.h"
 #include "whitaker.h"
 #include "settings.h"
+#include "calliope_application.h"
 
 Bookshelf * bookshelf;
 QStackedWidget * top_level;
@@ -23,10 +24,7 @@ FilterManager * filter_manager;
 
 int main(int argc, char ** argv)
 {
-    QApplication app(argc, argv);
-    QFont font("Droid Sans");
-    font.setBold(true);
-    app.setFont(font);
+    CalliopeApplication app(argc, argv);
 
     settings = new Settings();
     

@@ -65,7 +65,7 @@ void Bookshelf::scanDirectory(QString d)
         QFile * file = new QFile(fname);
             
         Mobi * mobi = new Mobi;
-        if (mobi->sniff(file))
+        if (mobi->sniff(file, file->fileName()))
         {
             qDebug("Adding [%s]", fname.toAscii().data());
             books.push_back(mobi);
@@ -74,7 +74,6 @@ void Bookshelf::scanDirectory(QString d)
         {
             qDebug("Can't read [%s]", fname.toAscii().data());
             delete mobi;
-            delete file;
         }
     }
 

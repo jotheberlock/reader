@@ -162,6 +162,28 @@ void ExthRecord::dump()
     }
 }
 
+Mobi::Mobi()
+{
+    device=0;
+    header=0;
+    records=0;
+    palmdoc_header=0;
+    mobi_header=0;
+}
+
+Mobi::~Mobi()
+{
+    delete device;
+    delete header;
+    delete records;
+    delete palmdoc_header;
+    delete mobi_header;
+    for (int loopc=0; loopc<exth_records.size(); loopc++)
+    {
+        delete exth_records[loopc];
+    }
+}
+
 QByteArray Mobi::readBlock(int b)
 {
     QByteArray outbuf;
@@ -273,9 +295,10 @@ QByteArray Mobi::readBlock(int b)
     return outbuf;
 }
 
-bool Mobi::sniff(QIODevice * d)
+bool Mobi::sniff(QIODevice * d, QString f)
 {
     device = d;
+    filename = f;
     if (!device->open(QIODevice::ReadOnly))
     {
         return false;

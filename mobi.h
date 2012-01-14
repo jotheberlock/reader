@@ -109,7 +109,10 @@ class Mobi
 {
   public:
 
-    bool sniff(QIODevice *);
+    Mobi();
+    ~Mobi();
+    
+    bool sniff(QIODevice *, QString);
     void open();
     void close();
     bool isOpen();
@@ -140,6 +143,11 @@ class Mobi
         return device;
     }
 
+    QString getFileName()
+    {
+        return filename;
+    }
+    
     QString getFullName()
     {
         return fullname;
@@ -152,6 +160,7 @@ class Mobi
     quint16 read16();
     quint32 read32();
 
+    QString filename;
     QString fullname;
     QIODevice * device;
     PDBHeader * header;
