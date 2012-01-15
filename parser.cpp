@@ -383,6 +383,7 @@ Element * Parser::next()
 
     Element * ret = element;
     element = 0;
+    in_paragraph = false;
     return ret;
 }
 

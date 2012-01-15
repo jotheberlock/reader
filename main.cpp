@@ -16,6 +16,7 @@
 #include "wordchangerfilter.h"
 #include "settings.h"
 #include "calliope_application.h"
+#include "mainwindow.h"
 
 Bookshelf * bookshelf;
 QStackedWidget * top_level;
@@ -51,7 +52,7 @@ int main(int argc, char ** argv)
     qsa->setWidget(shelfscreen); 
     shelfscreen->update();
     
-    top_level = new QStackedWidget;
+    top_level = new MainWindow;
     top_level->addWidget(qsa);
     
     settings->setActiveTouch("Word changer");
@@ -64,12 +65,6 @@ int main(int argc, char ** argv)
         shelfscreen->currentPage()->setPage(the_page);
     }
     
-    top_level->setGeometry(settings->getX(), settings->getY(),
-                           settings->getWidth(), settings->getHeight());
-    if (settings->getFullScreen())
-    {
-        top_level->setWindowState(top_level->windowState() ^ Qt::WindowFullScreen);
-    }
     top_level->show();
     
     app.exec();

@@ -130,13 +130,6 @@ void Page::resizeEvent(QResizeEvent *)
     {
         menubar->setGeometry(0, 0, width(), menubar->height());
     }
-        // This bit is a little hacky since we're not the top level window
-    QPoint topleft = mapToGlobal(QPoint(0,0));
-    settings->setX(topleft.x());
-    settings->setY(topleft.y());
-
-    settings->setWidth(width());
-    settings->setHeight(height());
 
     reflow();
 }

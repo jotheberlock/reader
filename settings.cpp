@@ -3,9 +3,9 @@
 #include "settings.h"
 
 Settings::Settings()
+    : settings("Joel Dillon", "Calliope")
 {
-    QCoreApplication::setOrganizationName("Joel Dillon");
-    QCoreApplication::setApplicationName("Calliope");
+    settings.beginGroup("General");
     
     needs_reflow = true;
         // set sensible defaults if necessary
