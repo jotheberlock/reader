@@ -6,5 +6,7 @@
      <file>images/smaller.png</file>
      <file>images/filters.png</file>
      <file>images/settings.png</file>
+     <file>images/quit.png</file>
+     <file>images/calliope.png</file>
  </qresource>
  </RCC>

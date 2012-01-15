@@ -59,6 +59,7 @@ class Page : public QFrame
     void smallerPushed();
     void filtersPushed();
     void settingsPushed();
+    void quitPushed();
     
   protected:
 

@@ -1,3 +1,5 @@
+#include <QtGui/QIcon>
+
 #include "mainwindow.h"
 #include "settings.h"
 
@@ -11,6 +13,7 @@ MainWindow::MainWindow()
     {
         setWindowState(windowState() ^ Qt::WindowFullScreen);
     }
+    setWindowIcon(QIcon(":/images/calliope.png"));
 }
 
 void MainWindow::closeEvent(QCloseEvent *)

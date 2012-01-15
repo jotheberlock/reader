@@ -3,6 +3,7 @@
 #include <QtCore/QFile>
 #include <QtGui/QPainter>
 #include <QtGui/QMessageBox>
+#include <QtGui/QApplication>
 
 #include "page.h"
 #include "mobi.h"
@@ -35,19 +36,23 @@ Page::Page(Mobi * m, Parser * p)
     next_y = 0;
     
     buttonbar = new QToolBar(this);
+    buttonbar->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     QAction * back_action = new QAction(QIcon(":/images/back.png"), "Back", this);
     QAction * dump_action = new QAction(QIcon(":/images/dump.png"), "Dump", this);
     QAction * bigger_action = new QAction(QIcon(":/images/bigger.png"), "Bigger", this);
     QAction * smaller_action = new QAction(QIcon(":/images/smaller.png"), "Smaller", this);
     QAction * filters_action = new QAction(QIcon(":/images/filters.png"), "Filters", this);
     QAction * settings_action = new QAction(QIcon(":/images/settings.png"), "Settings", this);
+    QAction * quit_action = new QAction(QIcon(":/images/quit.png"), "Quit", this);
     buttonbar->addAction(back_action);
     buttonbar->addAction(dump_action);
     buttonbar->addAction(bigger_action);
     buttonbar->addAction(smaller_action);
     buttonbar->addAction(filters_action);
     buttonbar->addAction(settings_action);
-#if defined(SPOONJUGGLINGBABOONS)
+    buttonbar->addAction(quit_action);
+    
+#if !defined(Q_OS_ANDROID)
     menubar = new QMenuBar(this);
     QMenu * menu = menubar->addMenu("&Menu");
     menu->addAction(back_action);
@@ -56,6 +61,7 @@ Page::Page(Mobi * m, Parser * p)
     menu->addAction(smaller_action);
     menu->addAction(filters_action);
     menu->addAction(settings_action);
+    menu->addAction(quit_action);
     menubar->setAutoFillBackground(true);
 #else
     menubar = 0;
@@ -66,6 +72,7 @@ Page::Page(Mobi * m, Parser * p)
     connect(smaller_action, SIGNAL(triggered()), this, SLOT(smallerPushed()));
     connect(filters_action, SIGNAL(triggered()), this, SLOT(filtersPushed()));
     connect(settings_action, SIGNAL(triggered()), this, SLOT(settingsPushed()));
+    connect(quit_action, SIGNAL(triggered()), this, SLOT(quitPushed()));
     buttonbar->setAutoFillBackground(true);
     buttonbar->hide();
     getSettings();
@@ -448,6 +455,11 @@ void Page::settingsPushed()
     ss->setGeometry(0,0,width(),height());
     ss->raise();
     ss->show();
+}
+
+void Page::quitPushed()
+{
+    QApplication::quit();
 }
 
 int Page::pageStart()
