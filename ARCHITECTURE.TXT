@@ -1,0 +1,55 @@
+A brief summary of the structure of the reader:
+
+mobi.cpp knows how to read a Mobipocket book, extract information from the 
+headers and read the raw (compressed) data from the file.
+
+bookdevice.cpp sits on top of mobi.cpp and provides a read-only QIODevice 
+that uncompresses the book text. This is an HTML 3.2 stream with some
+Mobipocket-specific tags.
+
+element.cpp defines the various types of page element supported by
+the reader - currently pagebreak, image and paragraph (<p>). It also
+knows how to render them.
+
+parser.cpp incrementally parses a BookDevice, returning an Element every
+time its called.
+
+filter.cpp defines the filter interface - these are called on every element
+at different stages in the book parsing process, giving the filter a chance
+to alter the text or layout.
+
+page.cpp is the widget which draws the book - it has a parser from which
+it finds the elements that are currently visible on screen, and it then
+renders them. It also has a toolbar and (on desktop) a menu.
+
+bookshelf.cpp is a non-GUI class that finds and provides access to the
+books, stored as a set of Mobi objects.
+
+settings.cpp wraps a QSettings object, keeping track of which settings
+changes require reflow (for instance, setting a larger font changes
+the layout, requiring elements to be re-found)
+
+settingsscreen.cpp does what it says - provides a UI to change various
+settings.
+
+filterpicker.cpp allows the user to turn on and off filters, and to select
+which one is invoked when the user clicks/touches the screen.
+
+dictionary.h defines a dictionary, which has a concrete subclass in 
+whitaker.cpp (a Latin dictionary based on a 'cooked' version of Whitaker's
+Words)
+
+dictionaryfilter.cpp is a filter which looks up words in a dictionary
+when the user selects them and pops up a definition.
+
+wordchangefilter.cpp is a filter which allows the user to select a word
+and change it, storing the change in a structure which is saved to disc
+(so the next time the user opens a book, his change is preserved, but
+the book itself is not altered). This is intended for spelling
+correction.
+
+calliope_application.cpp is a subclass of QApplication, allowing the
+reader to support session management.
+
+mainwindow.cpp is a subclass of QStackedWidget, there to allow proper
+use of QSettings to restore page position.
