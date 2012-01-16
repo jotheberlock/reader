@@ -1,3 +1,4 @@
+#include <limits.h>
 #include <QtGui/QSessionManager>
 
 #include "calliope_application.h"
