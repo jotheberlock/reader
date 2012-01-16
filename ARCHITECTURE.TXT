@@ -36,8 +36,10 @@ filterpicker.cpp allows the user to turn on and off filters, and to select
 which one is invoked when the user clicks/touches the screen.
 
 dictionary.h defines a dictionary, which has a concrete subclass in 
-whitaker.cpp (a Latin dictionary based on a 'cooked' version of Whitaker's
-Words)
+whitaker.cpp, a Latin dictionary based on a 'cooked' version of Whitaker's
+Words; it depends on files not in this repository since they are about 200
+megabytes of data, but the program to make them is at 
+https://github.com/jotheberlock/whitakerwords
 
 dictionaryfilter.cpp is a filter which looks up words in a dictionary
 when the user selects them and pops up a definition.
