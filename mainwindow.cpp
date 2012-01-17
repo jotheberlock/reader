@@ -27,12 +27,14 @@ void MainWindow::closeEvent(QCloseEvent *)
 
 void MainWindow::keyPressEvent(QKeyEvent * k)
 {
+#if defined(Q_OS_ANDROID)
     if (k->key() == Qt::Key_Menu) 
     {
         Page * page = dynamic_cast<Page *>(currentWidget());
         if (page)
         {
-            page->settingsPushed();
+            page->menuPushed();
         }
-    }    
+    }
+#endif
 }

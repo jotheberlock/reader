@@ -36,7 +36,7 @@ int main(int argc, char ** argv)
         */
     
 #if defined(Q_OS_ANDROID)
-    setGlobalStrut(QSize(50,50));
+    app.setGlobalStrut(QSize(50,50));
 #endif
     
     settings = new Settings();

@@ -74,7 +74,12 @@ Page::Page(Mobi * m, Parser * p)
     connect(settings_action, SIGNAL(triggered()), this, SLOT(settingsPushed()));
     connect(quit_action, SIGNAL(triggered()), this, SLOT(quitPushed()));
     buttonbar->setAutoFillBackground(true);
+#if defined(Q_OS_ANDROID)
     buttonbar->hide();
+#else    
+    buttonbar->show();
+    buttonbar->setGeometry(0,menubar->height(),width(),buttonbar->height());
+#endif
     getSettings();
  
     QList<Filter *> filters = filter_manager->getFilters();
@@ -135,9 +140,13 @@ void Page::resizeEvent(QResizeEvent *)
 {
     if (buttonbar->isVisible())
     {
+#if defined(Q_OS_ANDROID)
         int sensitive_zone_y = height() / 10;
         buttonbar->setGeometry(0, height() - sensitive_zone_y,
                                width(), sensitive_zone_y);
+#else
+        buttonbar->setGeometry(0,menubar->height(),width(),buttonbar->height());
+#endif
     }
 
     if (menubar)
@@ -151,7 +160,6 @@ void Page::resizeEvent(QResizeEvent *)
 void Page::mouseReleaseEvent(QMouseEvent * event)
 {
     int sensitive_zone_x = width() / 10;
-    int sensitive_zone_y = height() / 10;
     if (event->x() < sensitive_zone_x)
     {
         previousPage();
@@ -159,23 +167,6 @@ void Page::mouseReleaseEvent(QMouseEvent * event)
     else if (event->x() > width() - sensitive_zone_x)
     {
         nextPage();
-    }
-    else if (event->y() > height() - sensitive_zone_y)
-    {
-        if (buttonbar->isVisible())
-        {
-            buttonbar->hide();
-        }
-        else
-        {
-            buttonbar->setGeometry(0, height() - sensitive_zone_y,
-                                   width(), sensitive_zone_y);
-            buttonbar->show();
-        }
-    }
-    else if (buttonbar->isVisible())
-    {
-        buttonbar->hide();
     }
     else
     {
@@ -471,12 +462,37 @@ void Page::quitPushed()
     QApplication::quit();
 }
 
+void Page::menuPushed()
+{
+    if (buttonbar->isVisible())
+    {
+        buttonbar->hide();
+    }
+    else
+    {
+        int sensitive_zone_y = height() / 10;
+        buttonbar->setGeometry(0, height() - sensitive_zone_y,
+                               width(), sensitive_zone_y);
+        buttonbar->show();
+    }
+}
+
 int Page::pageStart()
 {
+    int ret = menubar ? menubar->height() : 0;
+#if !defined(Q_OS_ANDROID)
+    ret += buttonbar->height();
+#endif
+    return ret;
     return menubar ? menubar->height() : 0;
 }
 
 int Page::pageHeight()
 {
-    return menubar ? height() - menubar->height() : height();
+    int ret = height();
+    ret -= menubar ? menubar->height() : 0;
+#if !defined(Q_OS_ANDROID)
+    ret -= buttonbar->height();
+#endif
+    return ret;
 }

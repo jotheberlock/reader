@@ -61,6 +61,7 @@ class Page : public QFrame
     void filtersPushed();
     void settingsPushed();
     void quitPushed();
+    void menuPushed();
     
   protected:
 
