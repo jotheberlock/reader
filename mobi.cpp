@@ -358,15 +358,19 @@ bool Mobi::sniff(QIODevice * d, QString f)
         device->close();
         return false;
     }
-    
+
+#ifdef DEBUG_MODI
     header->dump();
     palmdoc_header->dump();
+#endif
     
     mobi_header = new MobiHeader;
     device->read((char *)mobi_header, sizeof(MobiHeader));
     mobi_header->swap();
+#ifdef DEBUG_MODI
     mobi_header->dump();
-
+#endif
+    
     if (mobi_header->drm_offset != 0xffffffff)
     {
         device->close();
@@ -412,7 +416,9 @@ bool Mobi::sniff(QIODevice * d, QString f)
         etr->data = new char[left_to_read+1];
         memset(etr->data, 0, left_to_read+1);
         device->read(etr->data, left_to_read);
+#ifdef DEBUG_MOBI
         etr->dump();
+#endif
         exth_records.push_back(etr);
     }
 

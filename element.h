@@ -40,6 +40,7 @@ class Element
     qint64 position()  { return current_position; }
     void setNumber(qint64 n) { element_number = n; }
     qint64 number() { return element_number; }
+    virtual void dump() {}
     
   protected:
 
@@ -131,6 +132,7 @@ class ParagraphElement : public Element
     }
 
     Word getWord(qint64 x, qint64 y);
+    virtual void dump();
     
   protected:
     

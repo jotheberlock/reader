@@ -31,9 +31,13 @@ int main(int argc, char ** argv)
         /* For some reason this doesn't work with Android Qt
 #if defined(Q_OS_ANDROID
  For usability's sake
- app.setStyleSheet("QScrollBar { width: 100 }");
+ app.setStyleSheet("QScrollBar { width: 50 }");
 #endif
         */
+    
+#if defined(Q_OS_ANDROID)
+    setGlobalStrut(QSize(50,50));
+#endif
     
     settings = new Settings();
     

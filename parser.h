@@ -44,7 +44,7 @@ class Parser
     void reset();
     
   protected:
-    
+
     void handleTag(QString);
     void handleContent(QString);
     QString handleSpecialEntity(QString);
@@ -61,6 +61,7 @@ class Parser
 
     QHash<QString, QString> void_tags;
     QHash<QString, QString> special_entities;
+    QHash<QString, QString> block_tags;
 
     Element * element;
     Mobi * mobi;

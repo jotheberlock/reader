@@ -20,7 +20,7 @@ CalliopeApplication::CalliopeApplication(int & argc, char ** argv)
     {
         exe_path = realbuf;
     }
-#endif    
+#endif
 }
 
 void CalliopeApplication::commitData(QSessionManager & sm)

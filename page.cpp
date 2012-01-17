@@ -14,7 +14,7 @@
 #include "settings.h"
 #include "settingsscreen.h"
 
-//#define DEBUG_LAYOUT
+// #define DEBUG_LAYOUT
 
 Page::Page(Mobi * m, Parser * p)
 {
@@ -186,6 +186,7 @@ void Page::mouseReleaseEvent(QMouseEvent * event)
 void Page::mouseFindElement(qint64 x, qint64 y)
 {
         // Convert y to logical units
+    y -= pageStart();
     y += (current_page * pageHeight());
     for (int loopc=0; loopc<elements.size(); loopc++)
     {
@@ -360,6 +361,7 @@ void Page::findElements()
         elements.push_back(tmp);
 #ifdef DEBUG_LAYOUT
         qDebug("Read new element %lld %lld", tmp->position(), tmp->height());
+        tmp->dump();
 #endif
         
         if(track_y > top_y + pageHeight())
@@ -389,7 +391,9 @@ void Page::previousPage()
 
 void Page::setPage(qint64 p)
 {
+#ifdef DEBUG_LAYOUT
     printf("Setting page to %lld\n", p);
+#endif
     current_page = p;
     findElements();
     settings->setCurrentPage(current_page);

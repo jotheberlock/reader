@@ -1,6 +1,7 @@
 #include "parser.h"
 
-// #define DEBUG_PARSER
+//#define DEBUG_PARSER
+
 Parser::Parser(QIODevice * d, Mobi * m)
 {
     device = d;
@@ -89,6 +90,27 @@ Parser::Parser(QIODevice * d, Mobi * m)
     special_entities["aelig"] = QChar(0x00e6);
     special_entities["OElig"] = QChar(0x0152);
     special_entities["oelig"] = QChar(0x0153);
+
+    block_tags["p"] = "p";
+    block_tags["h1"] = "h1";
+    block_tags["h2"] = "h2";
+    block_tags["h3"] = "h3";
+    block_tags["h4"] = "h4";
+    block_tags["h5"] = "h5";
+    block_tags["h6"] = "h6";
+    block_tags["dl"] = "dl";
+    block_tags["ol"] = "ol";
+    block_tags["ul"] = "ul";
+    block_tags["address"] = "address";
+    block_tags["blockquote"] = "blockquote";
+    block_tags["center"] = "center";
+    block_tags["del"] = "del";
+    block_tags["div"] = "div";
+    block_tags["hr"] = "hr";
+    block_tags["ins"] = "ins";
+    block_tags["noscript"] = "noscript";
+    block_tags["pre"] = "pre";
+    block_tags["script"] = "script";
 }
 
 Parser::~Parser()
@@ -133,26 +155,74 @@ void Parser::handleTag(QString s)
     if (s[0] == '/')
     {
         s = s.toLower();
+#ifdef DEBUG_PARSER
         if (tags.size() == 0)
         {
             qDebug("Got close tag [%s] without opening tag",
                    s.toAscii().data());
         }
+#endif
         
         Tag * top = tags.top();
-    
+        
+#ifdef DEBUG_PARSER
         if (s != "/" + top->name)
         {
             qDebug("Mismatched tag. [%s] [%s]",
                    s.toAscii().data(), top->name.toAscii().data());
         }
-
+#endif
+        
         dumpTag(top);
         tags.pop();
         delete top;
     }
     else
     {
+#ifdef DEBUG_PARSER
+        if (s.toLower() == "br")
+        {
+            qDebug("Br found in para %s", in_paragraph ? "yes" : "no");
+        }
+#endif
+            // Handles docs which are formatted as <br>text<br>text<br>
+            // We consider if this para was started by a br, it is also
+            // ended by one.
+        bool is_nested = false;
+        if ( (s.toLower() == "br") &&
+             (tags.size() > 0) &&
+             (tags.top()->name == "br") )
+        {
+            is_nested = true;
+        }
+        
+        if (in_paragraph && (block_tags.contains(s.toLower())))
+        {
+            is_nested = true;
+        }
+            
+        if (is_nested)
+        {
+#ifdef DEBUG_PARSER
+            qDebug("Nested block tag [%s]! %d",
+                   s.toLower().toAscii().data(), tags.size());
+#endif
+                // Nested block tag
+            if (tags.size() > 0)
+            {
+                Tag * top = tags.top();
+                dumpTag(top);
+                tags.pop();
+#ifdef DEBUG_PARSER
+                qDebug("Tags stack popped to %d", tags.size());
+                dumpStack();
+#endif
+                delete top;
+                in_paragraph = false;
+            }
+            return;
+        }
+            
         tags.push(new Tag);
         
         Tag * top = tags.top();
@@ -226,15 +296,20 @@ void Parser::handleTag(QString s)
             top->attributes.push_back(ta);
         }
 
-        if (top->name == "p")
+#ifdef DEBUG_PARSER        
+        qDebug("Name is [%s]", top->name.toAscii().data());
+#endif
+        if (top->name == "p" || top->name == "br")
         {
+#ifdef DEBUG_PARSER 
+            qDebug("Entering new paragraph");
+#endif
             element = new ParagraphElement;
             element->setNumber(next_element++);
             
             in_paragraph = true;
         }
-
-        if (void_tags.contains(top->name) || self_closing)
+        else if (void_tags.contains(top->name) || self_closing)
         {
             dumpTag(top);
             tags.pop();
@@ -247,12 +322,18 @@ void Parser::handleContent(QString s)
 {
     if (tags.size() == 0)
     {
-        qDebug("Content [%s] with no tag", s.toAscii().data()); 
+#ifdef DEBUG_PARSER 
+        qDebug("Content [%s] with no tag", s.toAscii().data());
+#endif
         return;
     }
 
     if (in_paragraph)
     {
+#ifdef DEBUG_PARSER 
+        qDebug("Adding text [%s] to %s", s.toAscii().data(),
+               tags.top()->name.toAscii().data());
+#endif
         StringFragment sf;
         sf.text = s.split(' ');
         for (int loopc=0; loopc<tags.size(); loopc++)
@@ -296,7 +377,6 @@ QString Parser::handleSpecialEntity(QString s)
         if (ok)
         {
             QString sret = QChar(ret);
-            qDebug(">> Returning %d [%s]", ret, sret.toUtf8().data());
             return sret;
         }
         else
@@ -350,10 +430,13 @@ Element * Parser::next()
             {
                 if (accum != "")
                 {
-#ifdef DEBUG_PARSER                    
-                    qDebug("Handlecontent for [%s] of [%s]",
-                           tags.top()->name.toAscii().data(),
-                           accum.toAscii().data());
+#ifdef DEBUG_PARSER
+                    if (tags.size() > 0)
+                    {
+                        qDebug("Handle content for [%s] of [%s]",
+                               tags.top()->name.toAscii().data(),
+                               accum.toAscii().data());
+                    }
 #endif
                     handleContent(accum);
                 }
@@ -400,25 +483,41 @@ void Parser::dumpTag(Tag * tag)
     }
 #endif
     
-    if (tag->name == "p")
-    {
+    if (tag->name == "p" || tag->name == "br")
+    {   
         if (element)
         {
             if (((ParagraphElement *)element)->numFragments() > 0)
             {
+#ifdef DEBUG_PARSER
+                qDebug("Have para for [%s], %d fragments",
+                       tag->contents.toAscii().data(),
+                       ((ParagraphElement *)element)->numFragments());
+                ((ParagraphElement *)element)->dump();
+#endif
                 continuing = false;
             }
+            else
+            {
+#ifdef DEBUG_PARSER
+                qDebug("Zero-fragment paragraph");
+#endif
+            } 
         }
         else
         {
-            qWarning("Null paragraph element");
+#ifdef DEBUG_PARSER
+            qDebug("Null paragraph element");
+#endif
         } 
         
         in_paragraph = false;
     }
     else if(tag->name == "mbp:pagebreak")
     {
-        printf("Making pagebreak element\n");
+#ifdef DEBUG_PARSER
+        qDebug("Making pagebreak element");
+#endif
         PagebreakElement * pe = new PagebreakElement;
         element = pe;
         element->setNumber(next_element++);
@@ -434,13 +533,16 @@ void Parser::dumpTag(Tag * tag)
                 int pnum = tag->attributes[loopc].value.toInt(&ok);
                 if (!ok)
                 {
+#ifdef DEBUG_PARSER
                     qDebug("Can't parse image [%s]",
                            tag->attributes[loopc].value.toAscii().data());
+#endif
                     break;
                 }
-
-                qDebug("Making image [%d]", pnum);
                 
+#ifdef DEBUG_PARSER
+                qDebug("Making image [%d]", pnum);
+#endif
                 QByteArray qba = mobi->readBlock(mobi->firstImage()+pnum-1);
                 QImage qi = QImage::fromData(qba, "GIF");
                 if (!qi.isNull())
@@ -452,7 +554,9 @@ void Parser::dumpTag(Tag * tag)
                 }
                 else
                 {
+#ifdef DEBUG_PARSER
                     qDebug("Is null");
+#endif
                 }
             }
         }

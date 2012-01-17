@@ -6,6 +6,29 @@
 #include "page.h"
 #include "filter.h"
 
+// #ifdef DEBUG_ELEMENTS
+
+void ParagraphElement::dump()
+{
+    if (fragments.size() == 0)
+    {
+        qDebug("Null paragraph element!");
+    }
+    
+    for (int loopc=0; loopc<fragments.size(); loopc++)
+    {
+        QString out = QString::number(loopc);
+        out += ": ";
+        StringFragment & sf = fragments[loopc];
+        for (int loopc2=0; loopc2<sf.text.size(); loopc2++)
+        {
+            out += sf.text[loopc2];
+            out += " ";
+        }
+        qDebug("%s", out.toAscii().data());
+    }   
+}
+
 qint64 ParagraphElement::height()
 {
     if (cached_height > -1)
@@ -77,7 +100,9 @@ qint64 ParagraphElement::height()
             if ( (ypos + line_length) > page_end)
             {
                     // Text drawn here would clip
+#ifdef DEBUG_ELEMENTS
                 qDebug("Paragraph %lld skipping to next page", element_number);
+#endif
                 cached_height += (page_end - ypos);
                 ypos = page_end;
                 page_end += page->getPageHeight();
@@ -164,13 +189,17 @@ qint64 PagebreakElement::height()
     qint64 ph = page->getPageHeight();
     if ( (current_position % ph) == 0)
     {
+#ifdef DEBUG_ELEMENTS
         qDebug("Null pagebreak");
+#endif
         return 0;
     }
     else
     {
+#ifdef DEBUG_ELEMENTS
         qDebug("Pagebreak %lld %lld %lld",
                ph, current_position, ph - (current_position %  ph));
+#endif
         return ph - (current_position % ph);
     } 
 }
