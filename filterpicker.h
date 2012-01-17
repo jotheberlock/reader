@@ -1,18 +1,18 @@
 #ifndef _FILTERPICKER_
 #define _FILTERPICKER_
 
-#include <QtGui/QWidget>
+#include <QtGui/QScrollArea>
 #include <QtGui/QBoxLayout>
 #include "settings.h"
 #include "filter.h"
 
-class FilterPicker : public QWidget
+class FilterPicker : public QScrollArea
 {
     Q_OBJECT
         
   public:
 
-    FilterPicker(QWidget * parent);
+    FilterPicker(Page * p);
 
     public slots:
 
@@ -23,6 +23,7 @@ class FilterPicker : public QWidget
 
     QBoxLayout * layout;
     QHash<QObject *, Filter *> filter_mapper;
+    Page * page;
     
 };
 

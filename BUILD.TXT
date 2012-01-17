@@ -1,0 +1,11 @@
+If on Ubuntu, qmake-qt4 calliope.pro ; make ; ./calliope
+
+If on Windows, install the latest Qt SDK from 
+http://qt.nokia.com/products/qt-sdk/ , open calliope.pro in Creator,
+build.
+
+If building for Android, grab the Necessitas SDK from
+http://sourceforge.net/projects/necessitas/files/, open calliope.pro in
+Creator, build.
+
+The app should compile on a Mac, but I don't have one to test with.

@@ -2,15 +2,19 @@
 #include <QtGui/QCheckBox>
 #include <QtCore/QSettings>
 
+#include "shelfscreen.h"
+#include "page.h"
 #include "filterpicker.h"
 
-FilterPicker::FilterPicker(QWidget * parent)
-    : QWidget(parent)
+FilterPicker::FilterPicker(Page * p)
+    : QScrollArea(p)
 {
+    page = p;
     layout = new QBoxLayout(QBoxLayout::TopToBottom, this);
     QList<Filter *> filters = filter_manager->getFilters();
     for (int loopc=0; loopc<filters.size(); loopc++)
     {
+        printf(">> filter woo\n");
         Filter * filter = filters[loopc];
         QCheckBox * filterbox = new QCheckBox(filter->name());
         layout->addWidget(filterbox,1);
@@ -40,6 +44,7 @@ void FilterPicker::filterChanged(int state)
 
 void FilterPicker::quitPressed()
 {
+    top_level->setCurrentWidget(page);
     close();
 }
 

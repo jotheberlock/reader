@@ -105,7 +105,14 @@ void Page::paintEvent(QPaintEvent *)
 
 void Page::displayMessage(QString caption, QString message)
 {
-    QMessageBox::about(this, caption, message);
+    QMessageBox qbm;
+    qbm.setWindowTitle(caption);
+    qbm.setText(message);
+    qbm.setStandardButtons(QMessageBox::Ok);
+    qbm.setDefaultButton(QMessageBox::Ok);
+    top_level->addWidget(&qbm);
+    top_level->setCurrentWidget(&qbm);
+    qbm.exec();
 }
 
 void Page::reflow()
@@ -444,17 +451,15 @@ void Page::smallerPushed()
 void Page::filtersPushed()
 {
     FilterPicker * fp = new FilterPicker(this);
-    fp->setGeometry(0,0,width(),height());
-    fp->raise();
-    fp->show();
+    top_level->addWidget(fp);
+    top_level->setCurrentWidget(fp);
 }
 
 void Page::settingsPushed()
 {
     SettingsScreen * ss = new SettingsScreen(this);
-    ss->setGeometry(0,0,width(),height());
-    ss->raise();
-    ss->show();
+    top_level->addWidget(ss);
+    top_level->setCurrentWidget(ss);
 }
 
 void Page::quitPushed()

@@ -1,7 +1,7 @@
 #ifndef _SETTINGSSCREEN_
 #define _SETTINGSSCREEN_
 
-#include <QtGui/QWidget>
+#include <QtGui/QScrollArea>
 #include <QtGui/QLineEdit>
 #include <QtGui/QComboBox>
 #include <QtGui/QGridLayout>
@@ -9,7 +9,7 @@
 #include "settings.h"
 #include "page.h"
 
-class SettingsScreen : public QWidget
+class SettingsScreen : public QScrollArea
 {
     Q_OBJECT
         

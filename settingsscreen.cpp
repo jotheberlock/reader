@@ -3,10 +3,11 @@
 #include <QtGui/QIntValidator>
 
 #include "settingsscreen.h"
+#include "shelfscreen.h"
 #include "filter.h"
 
 SettingsScreen::SettingsScreen(Page * p)
-    : QWidget(p)
+    : QScrollArea(p)
 {
     page =  p;
     
@@ -94,12 +95,14 @@ void SettingsScreen::quitPressed()
     {
         qDebug("No reflow!");
     }
-    
+
+    top_level->setCurrentWidget(page);
     close();
 }
 
 void SettingsScreen::cancelPressed()
 {
+    top_level->setCurrentWidget(page);
     close();
 }
 

@@ -2,6 +2,7 @@
 #define _MAINWINDOW_
 
 #include <QtGui/QStackedWidget>
+#include <QtGui/QKeyEvent>
 
 class MainWindow : public QStackedWidget
 {
@@ -9,6 +10,8 @@ class MainWindow : public QStackedWidget
 
     MainWindow();
     virtual void closeEvent(QCloseEvent *);
+
+    virtual void keyPressEvent(QKeyEvent *);
     
 };
 

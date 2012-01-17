@@ -11,6 +11,7 @@
 
 class Mobi;
 class Parser;
+class MainWindow;
 
 class Page : public QFrame
 {
@@ -24,7 +25,7 @@ class Page : public QFrame
     virtual void mouseReleaseEvent(QMouseEvent *);
     virtual void paintEvent(QPaintEvent *);
     virtual void resizeEvent(QResizeEvent *);
-
+     
     void addElement(Element * e)
     {
         elements.push_back(e);
@@ -87,7 +88,7 @@ class Page : public QFrame
     Parser * parser;
     QToolBar * buttonbar;
     QMenuBar * menubar;
-
+    
 };
 
 #endif

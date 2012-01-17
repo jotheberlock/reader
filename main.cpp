@@ -28,6 +28,13 @@ int main(int argc, char ** argv)
 {
     CalliopeApplication app(argc, argv);
 
+        /* For some reason this doesn't work with Android Qt
+#if defined(Q_OS_ANDROID
+ For usability's sake
+ app.setStyleSheet("QScrollBar { width: 100 }");
+#endif
+        */
+    
     settings = new Settings();
     
     filter_manager = new FilterManager();

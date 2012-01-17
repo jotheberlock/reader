@@ -9,6 +9,11 @@
 
 #include "bookdevice.h"
 
+// Documentation of the Mobi format exists at
+// http://wiki.mobileread.com/wiki/MOBI
+// http://wiki.mobileread.com/wiki/PDB#Palm_Database_Format
+// http://wiki.mobileread.com/wiki/PalmDOC (for compression)
+
 // #define DEBUG_MOBI
 
 QString PDBHeader::makeDate(quint32 date)
@@ -368,7 +373,7 @@ bool Mobi::sniff(QIODevice * d, QString f)
         return false;
     }
     
-    if (!mobi_header->exth_flags & 0x40)
+    if (!(mobi_header->exth_flags & 0x40))
     {
         device->close();
         goto finished;

@@ -23,7 +23,12 @@ it finds the elements that are currently visible on screen, and it then
 renders them. It also has a toolbar and (on desktop) a menu.
 
 bookshelf.cpp is a non-GUI class that finds and provides access to the
-books, stored as a set of Mobi objects.
+books, stored as a set of Mobi objects. Currently Calliope searches
+a fixed set of paths (~/Documents and ~/calliope on desktop Linux/Windows,
+/sdcard/kindle and /sdcard/calliope on Android).
+
+shelfscreen.cpp displays the list of books available to read, pulled
+from Bookshelf.
 
 settings.cpp wraps a QSettings object, keeping track of which settings
 changes require reflow (for instance, setting a larger font changes
@@ -55,3 +60,7 @@ reader to support session management.
 
 mainwindow.cpp is a subclass of QStackedWidget, there to allow proper
 use of QSettings to restore page position.
+
+calliope.css is an example of how to theme the reader using Qt's
+stylesheet mechanism. If Calliope finds a file with this name in any
+of its search directories it'll apply it as a theme.
