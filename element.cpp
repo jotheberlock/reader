@@ -166,7 +166,7 @@ Word ParagraphElement::getWord(qint64 x, qint64 y)
 qint64 PictureElement::height()
 {
     double sw = pixmap.width();
-    double dw = page->getPageWidth();
+    double dw = page->getPageWidth() - (page->getMargin() * 2);
     double multi = dw/sw;
     
     return (pixmap.height() * multi);
@@ -174,12 +174,15 @@ qint64 PictureElement::height()
 
 void PictureElement::render(qint64 offset)
 {
+    int margins = page->getMargin() * 2;
+    
     double sw = pixmap.width();
-    double dw = page->getPageWidth();
+    double dw = page->getPageWidth() - margins;
     double multi = dw/sw;
     
     QPainter painter(page);
-    QRect target(0, current_position+offset, page->getPageWidth(), pixmap.height() * multi);
+    QRect target(page->getMargin(),
+                 current_position+offset, page->getPageWidth() - margins, pixmap.height() * multi);
     QRect source(0,0,pixmap.width(), pixmap.height());
     painter.drawPixmap(target, pixmap, source);
 }

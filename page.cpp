@@ -44,13 +44,15 @@ Page::Page(Mobi * m, Parser * p)
     QAction * filters_action = new QAction(QIcon(":/images/filters.png"), "Filters", this);
     QAction * settings_action = new QAction(QIcon(":/images/settings.png"), "Settings", this);
     QAction * quit_action = new QAction(QIcon(":/images/quit.png"), "Quit", this);
+
+        // Add in order of usefulness
     buttonbar->addAction(back_action);
-    buttonbar->addAction(dump_action);
+    buttonbar->addAction(quit_action);
+    buttonbar->addAction(settings_action);
+    buttonbar->addAction(filters_action);
     buttonbar->addAction(bigger_action);
     buttonbar->addAction(smaller_action);
-    buttonbar->addAction(filters_action);
-    buttonbar->addAction(settings_action);
-    buttonbar->addAction(quit_action);
+    buttonbar->addAction(dump_action);
     
 #if !defined(Q_OS_ANDROID)
     menubar = new QMenuBar(this);
@@ -140,10 +142,9 @@ void Page::resizeEvent(QResizeEvent *)
 {
     if (buttonbar->isVisible())
     {
-#if defined(Q_OS_ANDROID)
-        int sensitive_zone_y = height() / 10;
-        buttonbar->setGeometry(0, height() - sensitive_zone_y,
-                               width(), sensitive_zone_y);
+#if defined(Q_OS_ANDROID)        
+        int h = buttonbar->sizeHint().height();
+        buttonbar->setGeometry(0, height() - h, width(), h);
 #else
         buttonbar->setGeometry(0,menubar->height(),width(),buttonbar->height());
 #endif
@@ -159,12 +160,11 @@ void Page::resizeEvent(QResizeEvent *)
 
 void Page::mouseReleaseEvent(QMouseEvent * event)
 {
-    int sensitive_zone_x = width() / 10;
-    if (event->x() < sensitive_zone_x)
+    if (event->x() < margin)
     {
         previousPage();
     }
-    else if (event->x() > width() - sensitive_zone_x)
+    else if (event->x() > width() - margin)
     {
         nextPage();
     }
@@ -470,10 +470,10 @@ void Page::menuPushed()
     }
     else
     {
-        int sensitive_zone_y = height() / 10;
-        buttonbar->setGeometry(0, height() - sensitive_zone_y,
-                               width(), sensitive_zone_y);
+        int h = buttonbar->sizeHint().height();
+        buttonbar->setGeometry(0, height() - h, width(), h);
         buttonbar->show();
+        buttonbar->raise();
     }
 }
 

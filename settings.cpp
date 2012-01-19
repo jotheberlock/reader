@@ -12,6 +12,15 @@ Settings::Settings()
         // this can alternatively done directly in value()
         // as in getFilterActive() below but this centralises
         // the defaults better
+    
+    if (!settings.contains("fontsize"))
+    {
+#if defined(Q_OS_ANDROID)
+        setFont("Droid Sans");
+#else
+        setFont("Times New Roman");
+#endif
+    }
     if (!settings.contains("fontsize"))
     {
         setFontSize(10);
@@ -30,7 +39,7 @@ Settings::Settings()
     }
     if (!settings.contains("margin"))
     {
-        setMargin(10);
+        setMargin(40);
     }
     
     if (!settings.contains("fullscreen"))
