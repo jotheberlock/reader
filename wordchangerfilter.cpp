@@ -119,6 +119,7 @@ void WordChangerFilter::onRelease(ParagraphElement * para, Page * page, qint64 x
     }
     
     cr.to = newstr;
+    page->setFocus(Qt::PopupFocusReason);
     page->reflow();
 }
 

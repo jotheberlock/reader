@@ -13,9 +13,16 @@
 #include "filterpicker.h"
 #include "settings.h"
 #include "settingsscreen.h"
+#include "infoscreen.h"
 
 // #define DEBUG_LAYOUT
 
+// Magic numbers for mouse gesture back/forward
+// If release is more than SLIDE_X from press but less than
+// SLIDE_Y use as gesture
+#define SLIDE_X 30
+#define SLIDE_Y 30
+    
 Page::Page(Mobi * m, Parser * p)
 {
     mobi = m;
@@ -34,6 +41,8 @@ Page::Page(Mobi * m, Parser * p)
 
     current_page = 0;
     next_y = 0;
+    press_x = 0;
+    press_y = 0;
     
     buttonbar = new QToolBar(this);
     buttonbar->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
@@ -112,14 +121,9 @@ void Page::paintEvent(QPaintEvent *)
 
 void Page::displayMessage(QString caption, QString message)
 {
-    QMessageBox qbm;
-    qbm.setWindowTitle(caption);
-    qbm.setText(message);
-    qbm.setStandardButtons(QMessageBox::Ok);
-    qbm.setDefaultButton(QMessageBox::Ok);
-    top_level->addWidget(&qbm);
-    top_level->setCurrentWidget(&qbm);
-    qbm.exec();
+    InfoScreen * is = new InfoScreen(this, caption, message);
+    top_level->addWidget(is);
+    top_level->setCurrentWidget(is);
 }
 
 void Page::reflow()
@@ -158,8 +162,28 @@ void Page::resizeEvent(QResizeEvent *)
     reflow();
 }
 
+void Page::mousePressEvent(QMouseEvent * event)
+{
+    press_x = event->x();
+    press_y = event->y();
+}
+
 void Page::mouseReleaseEvent(QMouseEvent * event)
 {
+    if (abs (press_y - event->y()) <  SLIDE_Y)
+    {
+        if ((event->x() - press_x) > SLIDE_X)
+        {
+            previousPage();
+            return;
+        }
+        else if ((press_x - event->x()) > SLIDE_X)
+        {
+            nextPage();
+            return;
+        }
+    }
+                 
     if (event->x() < margin)
     {
         previousPage();

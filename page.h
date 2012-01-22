@@ -22,6 +22,7 @@ class Page : public QFrame
     Page(Mobi *, Parser *);
     ~Page();
     
+    virtual void mousePressEvent(QMouseEvent *);
     virtual void mouseReleaseEvent(QMouseEvent *);
     virtual void paintEvent(QPaintEvent *);
     virtual void resizeEvent(QResizeEvent *);
@@ -84,6 +85,9 @@ class Page : public QFrame
     qint64 fontsize;
     qint64 leading;
     QString font;
+
+    int press_x;
+    int press_y;
     
     Mobi * mobi;
     Parser * parser;
