@@ -7,6 +7,9 @@
 #include "wordchangerfilter.h"
 #include "mobi.h"
 
+// Number of seconds until a press becomes 'undo' not 'change'
+#define UNDO_DELAY 2
+
 class ChangeRecord
 {
 public:
@@ -88,16 +91,37 @@ void WordChangerFilter::beforeLayout(ParagraphElement * p)
     }
 }
 
+
+void WordChangerFilter::onPress(ParagraphElement *, Page *, qint64, qint64)
+{
+    press_time = QTime::currentTime();
+}
+
 void WordChangerFilter::onRelease(ParagraphElement * para, Page * page, qint64 x,
                                   qint64 y)
 {
+    if (press_time.secsTo(QTime::currentTime()) > UNDO_DELAY)
+    {
+        if (changes.contains(para->number()))
+        {
+            ParagraphRecord * pr = changes[para->number()];
+            pr->changes.clear();
+            changes.remove(para->number());
+            delete pr;
+            page->reflow();
+        }
+        return;
+    }    
+    
     Word w = para->getWord(x,y);
     if (w.text == "")
     {
         return;
     }
 
-    QString newstr = QInputDialog::getText(page, "Enter new word", "New word");
+    QString newstr = QInputDialog::getText(page,
+                                           "Enter new word for '"+w.text+"'",
+                                           "New word");
     newstr.remove(" ");
     
     ParagraphRecord * pr;

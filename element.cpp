@@ -94,7 +94,6 @@ qint64 ParagraphElement::height()
             {
                 xpos = page->getMargin();
                 ypos += line_length;
-                cached_height += line_length;
             }
 
             if ( (ypos + line_length) > page_end)
@@ -103,7 +102,6 @@ qint64 ParagraphElement::height()
 #ifdef DEBUG_ELEMENTS
                 qDebug("Paragraph %lld skipping to next page", element_number);
 #endif
-                cached_height += (page_end - ypos);
                 ypos = page_end;
                 page_end += page->getPageHeight();
             }
@@ -123,9 +121,18 @@ qint64 ParagraphElement::height()
         }
     }
 
-        // Should calculate height properly here in
-        // case after filters changed it
-    cached_height += line_length;
+        // Calculate height, after words have possibly
+        // been moved by the above filters
+    for (int loopc=0; loopc<words.size(); loopc++)
+    {
+        Word & word = words[loopc];
+        qint64 bottom = (word.ly + word.h) - current_position;
+        if (bottom > cached_height)
+        {
+            cached_height = bottom;
+        }
+    }
+    
     return cached_height;
 }
 

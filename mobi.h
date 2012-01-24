@@ -111,7 +111,9 @@ class Mobi
 
     Mobi();
     ~Mobi();
-    
+
+        // Note that the mobi owns this QIODevice (the underlying QFile)
+        // and will delete it on destruction
     bool sniff(QIODevice *, QString);
     void open();
     void close();

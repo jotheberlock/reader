@@ -1,6 +1,7 @@
 #ifndef _WORDCHANGERFILTER_
 #define _WORDCHANGERFILTER_
 
+#include <QtCore/QTime>
 #include "filter.h"
 
 class ParagraphRecord;
@@ -17,12 +18,15 @@ class WordChangerFilter : public Filter
     virtual void endBook(Page *);
         // Called before StringFragments are laid out
     virtual void beforeLayout(ParagraphElement *);
+    virtual void onPress(ParagraphElement *, Page *, qint64 x, qint64 y);
+        // Touch to change word, hold to undo changes in paragraph
     virtual void onRelease(ParagraphElement *, Page *, qint64 x, qint64 y);
     
   protected:
 
     QHash<qint64, ParagraphRecord *> changes;
-
+    QTime press_time;
+    
     QString bookname;
     void save();
     void load();

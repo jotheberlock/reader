@@ -142,6 +142,20 @@ void Page::getSettings()
     leading = settings->getLeading();
 }
 
+
+void Page::showEvent(QShowEvent *)
+{
+    if (buttonbar->isVisible())
+    {
+#if defined(Q_OS_ANDROID)        
+        int h = buttonbar->sizeHint().height();
+        buttonbar->setGeometry(0, height() - h, width(), h);
+#else
+        buttonbar->setGeometry(0,menubar->height(),width(),buttonbar->height());
+#endif
+    }
+}
+
 void Page::resizeEvent(QResizeEvent *)
 {
     if (buttonbar->isVisible())
@@ -166,6 +180,11 @@ void Page::mousePressEvent(QMouseEvent * event)
 {
     press_x = event->x();
     press_y = event->y();
+
+    if (event->x() >= margin && event->x() <= (width() - margin))
+    {
+        mouseFindElement(event->x(), event->y(), true);
+    }
 }
 
 void Page::mouseReleaseEvent(QMouseEvent * event)
@@ -194,11 +213,11 @@ void Page::mouseReleaseEvent(QMouseEvent * event)
     }
     else
     {
-        mouseFindElement(event->x(), event->y());
+        mouseFindElement(event->x(), event->y(), false);
     } 
 }
 
-void Page::mouseFindElement(qint64 x, qint64 y)
+void Page::mouseFindElement(qint64 x, qint64 y, bool is_press)
 {
         // Convert y to logical units
     y -= pageStart();
@@ -216,7 +235,14 @@ void Page::mouseFindElement(qint64 x, qint64 y)
             Filter * f = filter_manager->getActiveTouchFilter();
             if (f)
             {
-                f->onRelease(e, this, x, y);
+                if (is_press)
+                {
+                    f->onPress(e, this, x, y);
+                }
+                else
+                {
+                    f->onRelease(e, this, x, y);
+                }
             }
         } 
     }

@@ -1,6 +1,6 @@
 #include "parser.h"
 
-//#define DEBUG_PARSER
+// #define DEBUG_PARSER
 
 Parser::Parser(QIODevice * d, Mobi * m)
 {

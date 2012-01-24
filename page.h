@@ -25,6 +25,7 @@ class Page : public QFrame
     virtual void mousePressEvent(QMouseEvent *);
     virtual void mouseReleaseEvent(QMouseEvent *);
     virtual void paintEvent(QPaintEvent *);
+    virtual void showEvent(QShowEvent *);
     virtual void resizeEvent(QResizeEvent *);
      
     void addElement(Element * e)
@@ -47,7 +48,7 @@ class Page : public QFrame
     Mobi * getMobi() { return mobi; }
     Parser * getParser() { return parser; }
     
-    void mouseFindElement(qint64 x, qint64 y);
+    void mouseFindElement(qint64 x, qint64 y, bool is_press);
     void displayMessage(QString caption, QString message);
 
     void reflow();

@@ -33,6 +33,8 @@ class Parser
 {
   public:
 
+        // Note that the parser owns the device (probably a BookDevice)
+        // and will delete it when deleted, but not the Mobi
     Parser(QIODevice * d, Mobi * m);
     ~Parser();
     
