@@ -73,8 +73,6 @@ qint64 ParagraphElement::height()
         {
             Word word;
             word.text = sf.text[loopc2];
-            word.lx = xpos;
-            word.ly = ypos;
             word.w = qfm.width(word.text);
             word.h = qfm.height();
             word.index = count;
@@ -82,12 +80,10 @@ qint64 ParagraphElement::height()
             
             qint64 adv = word.w + qfm.width(" ");
 
-                /*
-            printf("%lld %lld %lld %lld [%s]\n", xpos, ypos, adv,
+            qDebug("%lld %lld %lld %lld [%s]", xpos, ypos, adv,
                    (page->getPageWidth() - page->getMargin()),
                    word.text.toAscii().data());
-                */
-
+            
             line_length = qfm.lineSpacing() + page->getLeading();
             
             if ( (xpos + adv) > (page->getPageWidth() - page->getMargin()))
@@ -108,6 +104,8 @@ qint64 ParagraphElement::height()
             
             word.x = xpos;
             word.y = ypos+qfm.ascent();
+            word.lx = xpos;
+            word.ly = ypos;
             xpos += adv;
             words.push_back(word);
         }
@@ -132,7 +130,8 @@ qint64 ParagraphElement::height()
             cached_height = bottom;
         }
     }
-    
+
+    qDebug("Cached height is %lld", cached_height);
     return cached_height;
 }
 

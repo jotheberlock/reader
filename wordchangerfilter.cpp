@@ -6,6 +6,7 @@
 #include "bookshelf.h"
 #include "wordchangerfilter.h"
 #include "mobi.h"
+#include "shelfscreen.h"
 
 // Number of seconds until a press becomes 'undo' not 'change'
 #define UNDO_DELAY 2
@@ -119,32 +120,36 @@ void WordChangerFilter::onRelease(ParagraphElement * para, Page * page, qint64 x
         return;
     }
 
-    QString newstr = QInputDialog::getText(page,
-                                           "Enter new word for '"+w.text+"'",
-                                           "New word");
-    newstr.remove(" ");
-    
-    ParagraphRecord * pr;
-    if (changes[para->number()])
-    {
-        pr = changes[para->number()];
-    }
-    else
-    {
-        pr = new ParagraphRecord;
-        changes.insert(para->number(),pr);
-    }
+    QString newstr = QInputDialog::getText(top_level,
+                                           "Changing word",
+                                           "Enter new word for '"+w.text+"'");
 
-    ChangeRecord & cr = pr->changes[w.index];
-        // if previous record is there, maintain original word
-    if (cr.from == "")
+    if (newstr != "")
     {
-        cr.from = w.text;
-    }
+        newstr.remove(" ");
     
-    cr.to = newstr;
-    page->setFocus(Qt::PopupFocusReason);
-    page->reflow();
+        ParagraphRecord * pr;
+        if (changes[para->number()])
+        {
+            pr = changes[para->number()];
+        }
+        else
+        {
+            pr = new ParagraphRecord;
+            changes.insert(para->number(),pr);
+        }
+
+        ChangeRecord & cr = pr->changes[w.index];
+            // if previous record is there, maintain original word
+        if (cr.from == "")
+        {
+            cr.from = w.text;
+        }
+    
+        cr.to = newstr;
+        top_level->activateWindow();
+        page->reflow();
+    }
 }
 
 void WordChangerFilter::save()

@@ -8,6 +8,7 @@ MainWindow::MainWindow()
     : QStackedWidget(0)
 {
     setObjectName("mainwindow");
+    setFocusPolicy(Qt::StrongFocus);
     move(settings->getX(), settings->getY());
     resize(settings->getWidth(), settings->getHeight());
 #if defined(Q_OS_ANDROID)
@@ -30,6 +31,7 @@ void MainWindow::keyPressEvent(QKeyEvent * k)
 #if defined(Q_OS_ANDROID)
     if (k->key() == Qt::Key_Menu) 
     {
+        qDebug("Got menu!");
         Page * page = dynamic_cast<Page *>(currentWidget());
         if (page)
         {
