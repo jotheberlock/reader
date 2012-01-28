@@ -26,6 +26,7 @@ class Bookshelf : public QObject
     QString getFile(QString name);
 
     QDir getSaveDirectory();
+    void setSaveDirectory(QString s) { save_path = s; }
     
   signals:
 
@@ -41,6 +42,7 @@ class Bookshelf : public QObject
     QList<Mobi *> books;
     QList<QString> directories;
     QFileSystemWatcher * watcher;
+    QString save_path;
     
 };
 

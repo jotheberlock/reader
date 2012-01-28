@@ -10,6 +10,14 @@ Bookshelf::Bookshelf()
     watcher = new QFileSystemWatcher();
     connect(watcher, SIGNAL(directoryChanged(const QString &)), this,
             SLOT(dirChange(const QString &)));
+    
+#if defined(Q_OS_ANDROID)
+    setSaveDirectory("/sdcard/calliope");
+#else
+    QString docs_path;
+    docs_path = QDir::homePath() + QDir::separator();
+    setSaveDirectory(docs_path+"calliope");
+#endif
 }
 
 Bookshelf::~Bookshelf()
@@ -123,13 +131,7 @@ void Bookshelf::dirChange(const QString &)
 
 QDir Bookshelf::getSaveDirectory()
 {
-#if defined(Q_OS_ANDROID)
-    QDir save("/sdcard/calliope");
-#else
-    QString docs_path;
-    docs_path = QDir::homePath() + QDir::separator();
-    QDir save(docs_path+"calliope");
-#endif
+    QDir save(save_path);
     if (!save.exists())
     {
         save.mkpath(save.path());
