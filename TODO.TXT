@@ -1,18 +1,16 @@
-Need to theme better for Android/set a default theme that makes
-scrollbars wide enough to be touched.
+Store book position on a per-book basis instead of forgetting it whenever
+we go back to the bookshelf.
 
-Figure out why some books show no text at all.
+Implement a Qt version of the action bar, per
+http://android-developers.blogspot.com/2012/01/say-goodbye-to-menu-button.html
+
+Figure out why some books show no text at all (partially fixed; problem
+was antiquated HTML)
 
 Figure out a better way to display notifications/messages.
 
 Make the dictionary lookup asynchronous, load dictionary in a separate
 thread with progress indicator.
-
-Figure out how to allow alteration of words in the button bar sensitive
-area.
-
-Allow un-removal of words (perhaps a swipe gesture undoes all changes
-in an area?)
 
 Support more elements/types of formatting. 
 
