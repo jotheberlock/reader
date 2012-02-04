@@ -102,7 +102,7 @@ Parser::Parser(QIODevice * d, Mobi * m)
     block_tags["ol"] = "ol";
     block_tags["ul"] = "ul";
     block_tags["address"] = "address";
-    block_tags["blockquote"] = "blockquote";
+        //block_tags["blockquote"] = "blockquote";
     block_tags["center"] = "center";
     block_tags["del"] = "del";
     block_tags["div"] = "div";
@@ -155,13 +155,14 @@ void Parser::handleTag(QString s)
     if (s[0] == '/')
     {
         s = s.toLower();
-#ifdef DEBUG_PARSER
         if (tags.size() == 0)
         {
+#ifdef DEBUG_PARSER
             qDebug("Got close tag [%s] without opening tag",
                    s.toAscii().data());
-        }
 #endif
+            return;
+        }
         
         Tag * top = tags.top();
         
@@ -328,6 +329,12 @@ void Parser::handleContent(QString s)
         return;
     }
 
+    if (tags.top()->name == "blockquote")
+    {
+        qDebug("Blockquote with [%s], %s",
+               s.toAscii().data(), in_paragraph ? "yes" : "no");
+    }
+    
     if (in_paragraph)
     {
 #ifdef DEBUG_PARSER 
