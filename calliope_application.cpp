@@ -1,5 +1,8 @@
 #include <limits.h>
 #include <QtGui/QSessionManager>
+#if defined(__linux__)
+#include <unistd.h>
+#endif
 
 #include "calliope_application.h"
 #include "settings.h"
