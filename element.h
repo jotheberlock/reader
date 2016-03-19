@@ -1,10 +1,10 @@
 #ifndef _ELEMENT_
 #define _ELEMENT_
 
-#include <QtCore/QStringList>
-#include <QtGui/QPaintDevice>
-#include <QtGui/QFont>
-#include <QtGui/QPixmap>
+#include <QStringList>
+#include <QPaintDevice>
+#include <QFont>
+#include <QPixmap>
 
 class Page;
 

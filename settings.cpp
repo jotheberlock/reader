@@ -1,4 +1,4 @@
-#include <QtCore/QCoreApplication>
+#include <QCoreApplication>
 
 #include "settings.h"
 

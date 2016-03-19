@@ -1,7 +1,7 @@
 #ifndef _CALLIOPE_APPLICATION_
 #define _CALLIOPE_APPLICATION_
 
-#include <QtGui/QApplication>
+#include <QApplication>
 
 class CalliopeApplication : public QApplication
 {

@@ -1,8 +1,8 @@
 #ifndef _MAINWINDOW_
 #define _MAINWINDOW_
 
-#include <QtGui/QStackedWidget>
-#include <QtGui/QKeyEvent>
+#include <QStackedWidget>
+#include <QKeyEvent>
 
 class MainWindow : public QStackedWidget
 {

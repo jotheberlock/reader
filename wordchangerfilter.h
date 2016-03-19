@@ -1,7 +1,7 @@
 #ifndef _WORDCHANGERFILTER_
 #define _WORDCHANGERFILTER_
 
-#include <QtCore/QTime>
+#include <QTime>
 #include "filter.h"
 
 class ParagraphRecord;

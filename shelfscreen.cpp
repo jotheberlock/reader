@@ -1,4 +1,4 @@
-#include <QtCore/QCoreApplication>
+#include <QCoreApplication>
 
 #include "shelfscreen.h"
 #include "page.h"

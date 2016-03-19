@@ -1,10 +1,10 @@
 #ifndef _PARSER_
 #define _PARSER_
 
-#include <QtCore/QStack>
-#include <QtCore/QTextStream>
-#include <QtCore/QIODevice>
-#include <QtCore/QHash>
+#include <QStack>
+#include <QTextStream>
+#include <QIODevice>
+#include <QHash>
 
 #include "element.h"
 #include "mobi.h"

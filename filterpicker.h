@@ -1,8 +1,8 @@
 #ifndef _FILTERPICKER_
 #define _FILTERPICKER_
 
-#include <QtGui/QScrollArea>
-#include <QtGui/QBoxLayout>
+#include <QScrollArea>
+#include <QBoxLayout>
 #include "settings.h"
 #include "filter.h"
 

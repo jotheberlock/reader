@@ -2,7 +2,7 @@
 #define _BOOKDEVICE_
 
 #include <stdio.h>
-#include <QtCore/QIODevice>
+#include <QIODevice>
 
 class Mobi;
 

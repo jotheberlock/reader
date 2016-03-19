@@ -1,11 +1,11 @@
 #ifndef _SETTINGSSCREEN_
 #define _SETTINGSSCREEN_
 
-#include <QtGui/QScrollArea>
-#include <QtGui/QLineEdit>
-#include <QtGui/QComboBox>
-#include <QtGui/QGridLayout>
-#include <QtGui/QPushButton>
+#include <QScrollArea>
+#include <QLineEdit>
+#include <QComboBox>
+#include <QGridLayout>
+#include <QPushButton>
 #include "settings.h"
 #include "page.h"
 

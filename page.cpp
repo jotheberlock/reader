@@ -1,9 +1,9 @@
 #include <stdio.h>
 
-#include <QtCore/QFile>
-#include <QtGui/QPainter>
-#include <QtGui/QMessageBox>
-#include <QtGui/QApplication>
+#include <QFile>
+#include <QPainter>
+#include <QMessageBox>
+#include <QApplication>
 
 #include "page.h"
 #include "mobi.h"

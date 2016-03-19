@@ -1,7 +1,7 @@
 #ifndef _DICTIONARY_
 #define _DICTIONARY_
 
-#include <QtCore/QString>
+#include <QString>
 
 class Dictionary
 {

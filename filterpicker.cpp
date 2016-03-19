@@ -1,6 +1,6 @@
-#include <QtGui/QPushButton>
-#include <QtGui/QCheckBox>
-#include <QtCore/QSettings>
+#include <QPushButton>
+#include <QCheckBox>
+#include <QSettings>
 
 #include "shelfscreen.h"
 #include "page.h"

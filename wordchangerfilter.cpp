@@ -1,7 +1,7 @@
-#include <QtCore/QHash>
-#include <QtCore/QDir>
-#include <QtCore/QTextStream>
-#include <QtGui/QInputDialog>
+#include <QHash>
+#include <QDir>
+#include <QTextStream>
+#include <QInputDialog>
 
 #include "bookshelf.h"
 #include "wordchangerfilter.h"
@@ -75,8 +75,8 @@ void WordChangerFilter::beforeLayout(ParagraphElement * p)
                 else
                 {
                     qWarning("Expected to change [%s] to [%s] found [%s]",
-                             cr.from.toAscii().data(), cr.to.toAscii().data(),
-                             text[loopc2].toAscii().data());
+                             cr.from.toUtf8().data(), cr.to.toUtf8().data(),
+                             text[loopc2].toUtf8().data());
                 }
                 i++;
                 if (i == pr->changes.constEnd())
@@ -163,7 +163,7 @@ void WordChangerFilter::save()
     QFile out(save.path()+QDir::separator()+bookname+".wcf");
     if (!out.open(QIODevice::WriteOnly))
     {
-        qWarning("Could not open %s", out.fileName().toAscii().data());
+        qWarning("Could not open %s", out.fileName().toUtf8().data());
         return;
     }
 
@@ -204,7 +204,7 @@ void WordChangerFilter::load()
     QFile in(save.path()+QDir::separator()+bookname+".wcf");
     if (!in.open(QIODevice::ReadOnly))
     {
-        qWarning("Could not open %s", in.fileName().toAscii().data());
+        qWarning("Could not open %s", in.fileName().toUtf8().data());
         return;
     }
 
@@ -219,7 +219,7 @@ void WordChangerFilter::load()
         QStringList qsl = ins.split(" ");
         if (qsl.size() != 4)
         {
-            qWarning("Odd line [%s]", ins.toAscii().data());
+            qWarning("Odd line [%s]", ins.toUtf8().data());
             continue;
         }
         

@@ -1,11 +1,11 @@
 #include "mobi.h"
 
-#include <QtCore/QtEndian>
-#include <QtCore/QFile>
-#include <QtGui/QTextEdit>
-#include <QtCore/QDateTime>
-#include <QtCore/QTextCodec>
-#include <QtCore/QTextStream>
+#include <QtEndian>
+#include <QFile>
+#include <QTextEdit>
+#include <QDateTime>
+#include <QTextCodec>
+#include <QTextStream>
 
 #include "bookdevice.h"
 
@@ -53,9 +53,9 @@ void PDBHeader::dump()
     qDebug("Name [%s]", name);
     qDebug("Attributes %x", attributes);
     qDebug("Version %x", version);
-    qDebug("Create date %s", makeDate(create_date).toAscii().data());
-    qDebug("Mod date %s", makeDate(mod_date).toAscii().data());
-    qDebug("Backup date %s", makeDate(backup_date).toAscii().data());
+    qDebug("Create date %s", makeDate(create_date).toUtf8().data());
+    qDebug("Mod date %s", makeDate(mod_date).toUtf8().data());
+    qDebug("Backup date %s", makeDate(backup_date).toUtf8().data());
     qDebug("Mod number %d", mod_number);
     qDebug("appInfoID %d", appInfoID);
     qDebug("sortInfoID %d", sortInfoID);

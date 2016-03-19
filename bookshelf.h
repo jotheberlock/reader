@@ -1,10 +1,10 @@
 #ifndef _BOOKSHELF_
 #define _BOOKSHELF_
 
-#include <QtCore/QList>
-#include <QtCore/QFile>
-#include <QtCore/QFileSystemWatcher>
-#include <QtCore/QDir>
+#include <QList>
+#include <QFile>
+#include <QFileSystemWatcher>
+#include <QDir>
 
 #include "mobi.h"
 

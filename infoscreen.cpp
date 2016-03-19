@@ -1,7 +1,7 @@
-#include <QtGui/QVBoxLayout>
-#include <QtGui/QPushButton>
-#include <QtGui/QTextEdit>
-#include <QtGui/QLabel>
+#include <QVBoxLayout>
+#include <QPushButton>
+#include <QTextEdit>
+#include <QLabel>
 
 #include "shelfscreen.h"
 #include "infoscreen.h"

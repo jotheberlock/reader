@@ -1,10 +1,10 @@
 #ifndef _SHELFSCREEN_
 #define _SHELFSCREEN_
 
-#include <QtGui/QGridLayout>
-#include <QtGui/QLabel>
-#include <QtGui/QPushButton>
-#include <QtGui/QStackedWidget>
+#include <QGridLayout>
+#include <QLabel>
+#include <QPushButton>
+#include <QStackedWidget>
 
 #include "bookshelf.h"
 

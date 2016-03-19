@@ -1,7 +1,7 @@
-#include <QtCore/QFile>
-#include <QtCore/QDir>
-#include <QtCore/QTextStream>
-#include <QtGui/QApplication>
+#include <QFile>
+#include <QDir>
+#include <QTextStream>
+#include <QApplication>
 
 #include "whitaker.h"
 #include "bookshelf.h"
@@ -35,7 +35,7 @@
          QFile definitions(dpath);
          definitions.open(QIODevice::ReadOnly);
          qDebug("Matching [%s] with %lld %lld",
-                word.toAscii().data(), wl.pos, wl.len);
+                word.toUtf8().data(), wl.pos, wl.len);
 
          definitions.seek(wl.pos);
          QByteArray data = definitions.read(wl.len);
@@ -44,7 +44,7 @@
      }
      else
      {
-         qDebug("Can't find [%s]", word.toAscii().data());
+         qDebug("Can't find [%s]", word.toUtf8().data());
          return "Unknown";
      }
  }

@@ -1,7 +1,7 @@
 #ifndef _WHITAKER_
 #define _WHITAKER
 
-#include <QtCore/QMap>
+#include <QMap>
 #include "dictionary.h"
 
 class WhitLocation

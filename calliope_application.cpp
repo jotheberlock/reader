@@ -1,5 +1,5 @@
 #include <limits.h>
-#include <QtGui/QSessionManager>
+#include <QSessionManager>
 #if defined(__linux__)
 #include <unistd.h>
 #endif

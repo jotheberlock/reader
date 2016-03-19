@@ -1,8 +1,8 @@
 #include "bookshelf.h"
 
-#include <QtCore/QDir>
-#include <QtCore/QTextStream>
-#include <QtGui/QApplication>
+#include <QDir>
+#include <QTextStream>
+#include <QApplication>
 
 Bookshelf::Bookshelf()
     : QObject(0)
@@ -27,7 +27,7 @@ Bookshelf::~Bookshelf()
 
 void Bookshelf::addPath(QString d)
 {
-    qDebug("Adding path %s", d.toAscii().data());
+    qDebug("Adding path %s", d.toUtf8().data());
     
     QDir dir(d);
     if (!dir.exists())
@@ -75,12 +75,12 @@ void Bookshelf::scanDirectory(QString d)
         Mobi * mobi = new Mobi;
         if (mobi->sniff(file, entries[loopc]))
         {
-            qDebug("Adding [%s]", fname.toAscii().data());
+            qDebug("Adding [%s]", fname.toUtf8().data());
             books.push_back(mobi);
         }
         else
         {
-            qDebug("Can't read [%s]", fname.toAscii().data());
+            qDebug("Can't read [%s]", fname.toUtf8().data());
             delete mobi;
         }
     }

@@ -1,4 +1,4 @@
-#include <QtGui/QIcon>
+#include <QIcon>
 
 #include "mainwindow.h"
 #include "settings.h"

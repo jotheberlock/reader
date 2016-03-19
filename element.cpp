@@ -1,6 +1,6 @@
 #include <stdio.h>
-#include <QtGui/QPainter>
-#include <QtGui/QFontMetrics>
+#include <QPainter>
+#include <QFontMetrics>
 
 #include "element.h"
 #include "page.h"
@@ -25,7 +25,7 @@ void ParagraphElement::dump()
             out += sf.text[loopc2];
             out += " ";
         }
-        qDebug("%s", out.toAscii().data());
+        qDebug("%s", out.toUtf8().data());
     }   
 }
 
@@ -82,7 +82,7 @@ qint64 ParagraphElement::height()
 
             qDebug("%lld %lld %lld %lld [%s]", xpos, ypos, adv,
                    (page->getPageWidth() - page->getMargin()),
-                   word.text.toAscii().data());
+                   word.text.toUtf8().data());
             
             line_length = qfm.lineSpacing() + page->getLeading();
             

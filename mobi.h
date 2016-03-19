@@ -1,9 +1,9 @@
 #ifndef _MOBI_
 #define _MOBI_
 
-#include <QtCore/QDataStream>
-#include <QtCore/QVector>
-#include <QtGui/QImage>
+#include <QDataStream>
+#include <QVector>
+#include <QImage>
 
 class PDBHeader
 {

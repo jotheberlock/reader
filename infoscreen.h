@@ -1,7 +1,7 @@
 #ifndef _INFOSCREEN_
 #define _INFOSCREEN_
 
-#include <QtGui/QScrollArea>
+#include <QScrollArea>
 #include "page.h"
 
 class InfoScreen : public QScrollArea

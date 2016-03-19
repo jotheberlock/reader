@@ -1,8 +1,8 @@
-#include <QtCore/QFile>
-#include <QtCore/QBuffer>
-#include <QtCore/QDir>
-#include <QtGui/QApplication>
-#include <QtGui/QScrollArea>
+#include <QFile>
+#include <QBuffer>
+#include <QDir>
+#include <QApplication>
+#include <QScrollArea>
 
 #include "mobi.h"
 #include "page.h"

@@ -1,8 +1,8 @@
 #ifndef _SETTINGS_
 #define _SETTINGS_
 
-#include <QtCore/QString>
-#include <QtCore/QSettings>
+#include <QString>
+#include <QSettings>
 
 class Settings
 {

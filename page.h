@@ -1,11 +1,11 @@
 #ifndef _PAGE_
 #define _PAGE_
 
-#include <QtGui/QFrame>
-#include <QtGui/QMouseEvent>
-#include <QtGui/QToolBar>
-#include <QtGui/QMenuBar>
-#include <QtGui/QAction>
+#include <QFrame>
+#include <QMouseEvent>
+#include <QToolBar>
+#include <QMenuBar>
+#include <QAction>
 
 #include "element.h"
 

@@ -1,6 +1,6 @@
-#include <QtGui/QLabel>
-#include <QtGui/QFontDatabase>
-#include <QtGui/QIntValidator>
+#include <QLabel>
+#include <QFontDatabase>
+#include <QIntValidator>
 
 #include "settingsscreen.h"
 #include "shelfscreen.h"

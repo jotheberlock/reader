@@ -159,7 +159,7 @@ void Parser::handleTag(QString s)
         {
 #ifdef DEBUG_PARSER
             qDebug("Got close tag [%s] without opening tag",
-                   s.toAscii().data());
+                   s.toUtf8().data());
 #endif
             return;
         }
@@ -170,7 +170,7 @@ void Parser::handleTag(QString s)
         if (s != "/" + top->name)
         {
             qDebug("Mismatched tag. [%s] [%s]",
-                   s.toAscii().data(), top->name.toAscii().data());
+                   s.toUtf8().data(), top->name.toUtf8().data());
         }
 #endif
         
@@ -206,7 +206,7 @@ void Parser::handleTag(QString s)
         {
 #ifdef DEBUG_PARSER
             qDebug("Nested block tag [%s]! %d",
-                   s.toLower().toAscii().data(), tags.size());
+                   s.toLower().toUtf8().data(), tags.size());
 #endif
                 // Nested block tag
             if (tags.size() > 0)
@@ -298,7 +298,7 @@ void Parser::handleTag(QString s)
         }
 
 #ifdef DEBUG_PARSER        
-        qDebug("Name is [%s]", top->name.toAscii().data());
+        qDebug("Name is [%s]", top->name.toUtf8().data());
 #endif
         if (top->name == "p" || top->name == "br")
         {
@@ -324,7 +324,7 @@ void Parser::handleContent(QString s)
     if (tags.size() == 0)
     {
 #ifdef DEBUG_PARSER 
-        qDebug("Content [%s] with no tag", s.toAscii().data());
+        qDebug("Content [%s] with no tag", s.toUtf8().data());
 #endif
         return;
     }
@@ -332,14 +332,14 @@ void Parser::handleContent(QString s)
     if (tags.top()->name == "blockquote")
     {
         qDebug("Blockquote with [%s], %s",
-               s.toAscii().data(), in_paragraph ? "yes" : "no");
+               s.toUtf8().data(), in_paragraph ? "yes" : "no");
     }
     
     if (in_paragraph)
     {
 #ifdef DEBUG_PARSER 
-        qDebug("Adding text [%s] to %s", s.toAscii().data(),
-               tags.top()->name.toAscii().data());
+        qDebug("Adding text [%s] to %s", s.toUtf8().data(),
+               tags.top()->name.toUtf8().data());
 #endif
         StringFragment sf;
         sf.text = s.split(' ');
@@ -362,7 +362,7 @@ void Parser::handleContent(QString s)
 QString Parser::handleSpecialEntity(QString s)
 {
 #ifdef DEBUG_PARSER    
-    qDebug("Looking for entity [%s]", s.toAscii().data());
+    qDebug("Looking for entity [%s]", s.toUtf8().data());
 #endif
     
     if (s[0] == '#')
@@ -441,8 +441,8 @@ Element * Parser::next()
                     if (tags.size() > 0)
                     {
                         qDebug("Handle content for [%s] of [%s]",
-                               tags.top()->name.toAscii().data(),
-                               accum.toAscii().data());
+                               tags.top()->name.toUtf8().data(),
+                               accum.toUtf8().data());
                     }
 #endif
                     handleContent(accum);
@@ -481,12 +481,12 @@ void Parser::dumpTag(Tag * tag)
 {
 #ifdef DEBUG_PARSER
     qDebug("Name [%s] Contents [%s]",
-           tag->name.toAscii().data(), tag->contents.toAscii().data());
+           tag->name.toUtf8().data(), tag->contents.toUtf8().data());
     for (int loopc=0; loopc<tag->attributes.size();loopc++)
     {
         qDebug("[%s] = [%s]",
-               tag->attributes[loopc].name.toAscii().data(),
-               tag->attributes[loopc].value.toAscii().data());
+               tag->attributes[loopc].name.toUtf8().data(),
+               tag->attributes[loopc].value.toUtf8().data());
     }
 #endif
     
@@ -498,7 +498,7 @@ void Parser::dumpTag(Tag * tag)
             {
 #ifdef DEBUG_PARSER
                 qDebug("Have para for [%s], %d fragments",
-                       tag->contents.toAscii().data(),
+                       tag->contents.toUtf8().data(),
                        ((ParagraphElement *)element)->numFragments());
                 ((ParagraphElement *)element)->dump();
 #endif
@@ -542,7 +542,7 @@ void Parser::dumpTag(Tag * tag)
                 {
 #ifdef DEBUG_PARSER
                     qDebug("Can't parse image [%s]",
-                           tag->attributes[loopc].value.toAscii().data());
+                           tag->attributes[loopc].value.toUtf8().data());
 #endif
                     break;
                 }
@@ -574,6 +574,6 @@ void Parser::dumpStack()
 {
     for (int loopc=0; loopc<tags.size(); loopc++)
     {
-        qDebug("%d: [%s]", loopc, tags[loopc]->name.toAscii().data());
+        qDebug("%d: [%s]", loopc, tags[loopc]->name.toUtf8().data());
     }
 }
