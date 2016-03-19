@@ -62,8 +62,7 @@ Page::Page(Mobi * m, Parser * p)
     buttonbar->addAction(bigger_action);
     buttonbar->addAction(smaller_action);
     buttonbar->addAction(dump_action);
-    
-#if !defined(Q_OS_ANDROID)
+
     menubar = new QMenuBar(this);
     QMenu * menu = menubar->addMenu("&Menu");
     menu->addAction(back_action);
@@ -74,9 +73,7 @@ Page::Page(Mobi * m, Parser * p)
     menu->addAction(settings_action);
     menu->addAction(quit_action);
     menubar->setAutoFillBackground(true);
-#else
-    menubar = 0;
-#endif
+
     connect(back_action, SIGNAL(triggered()), this, SLOT(backPushed()));
     connect(dump_action, SIGNAL(triggered()), this, SLOT(dumpPushed()));
     connect(bigger_action, SIGNAL(triggered()), this, SLOT(biggerPushed()));
@@ -85,12 +82,8 @@ Page::Page(Mobi * m, Parser * p)
     connect(settings_action, SIGNAL(triggered()), this, SLOT(settingsPushed()));
     connect(quit_action, SIGNAL(triggered()), this, SLOT(quitPushed()));
     buttonbar->setAutoFillBackground(true);
-#if defined(Q_OS_ANDROID)
-    buttonbar->hide();
-#else    
     buttonbar->show();
     buttonbar->setGeometry(0,menubar->height(),width(),buttonbar->height());
-#endif
     getSettings();
  
     QList<Filter *> filters = filter_manager->getFilters();
@@ -147,12 +140,7 @@ void Page::showEvent(QShowEvent *)
 {
     if (buttonbar->isVisible())
     {
-#if defined(Q_OS_ANDROID)        
-        int h = buttonbar->sizeHint().height();
-        buttonbar->setGeometry(0, height() - h, width(), h);
-#else
         buttonbar->setGeometry(0,menubar->height(),width(),buttonbar->height());
-#endif
     }
 }
 
@@ -160,12 +148,7 @@ void Page::resizeEvent(QResizeEvent *)
 {
     if (buttonbar->isVisible())
     {
-#if defined(Q_OS_ANDROID)        
-        int h = buttonbar->sizeHint().height();
-        buttonbar->setGeometry(0, height() - h, width(), h);
-#else
         buttonbar->setGeometry(0,menubar->height(),width(),buttonbar->height());
-#endif
     }
 
     if (menubar)
@@ -530,9 +513,7 @@ void Page::menuPushed()
 int Page::pageStart()
 {
     int ret = menubar ? menubar->height() : 0;
-#if !defined(Q_OS_ANDROID)
     ret += buttonbar->height();
-#endif
     return ret;
     return menubar ? menubar->height() : 0;
 }
@@ -541,8 +522,6 @@ int Page::pageHeight()
 {
     int ret = height();
     ret -= menubar ? menubar->height() : 0;
-#if !defined(Q_OS_ANDROID)
     ret -= buttonbar->height();
-#endif
     return ret;
 }
